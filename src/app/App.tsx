@@ -1,13 +1,11 @@
-import { Button } from '@/shared/ui/button'
+import { RouterProvider } from 'react-router'
 import { QueryProvider } from './providers/query-provider'
+import { router } from './routing/router'
 
-function App() {
+export function App() {
   return (
     <QueryProvider>
-      <div className="p-8">
-        <h1 className="text-3xl font-bold mb-4">TaskFlow</h1>
-        <Button>Кнопка работает!</Button>
-      </div>
+      <RouterProvider router={router} />
     </QueryProvider>
   )
 }

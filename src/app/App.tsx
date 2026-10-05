@@ -1,19 +1,13 @@
-import { Button } from '@/shared/ui/button/button'
+import { Button } from '@/shared/ui/button'
 import { QueryProvider } from './providers/query-provider'
 
 function App() {
   return (
     <QueryProvider>
-      <section id="center">
-        <div>
-          <h1 className="text-3xl font-bold underline">Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-
+      <div className="p-8">
+        <h1 className="text-3xl font-bold mb-4">TaskFlow</h1>
         <Button>Кнопка работает!</Button>
-      </section>
+      </div>
     </QueryProvider>
   )
 }

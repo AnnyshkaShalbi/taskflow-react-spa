@@ -1,75 +1,104 @@
-# React + TypeScript + Vite
+# TaskFlow
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+SPA-трекер задач и привычек для удалённых команд. Канбан-доска, повторяющиеся привычки, графики прогресса и шаринг досок — всё на клиенте с имитацией API через MSW.
 
-Currently, two official plugins are available:
+## ✨ Возможности
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- 📋 Канбан-доска с drag-and-drop
+- 🔁 Трекер повторяющихся привычек
+- 📊 Графики прогресса
+- 👥 Шаринг досок с коллегами
+- 🔐 Авторизация (имитация через MSW)
+- 🌗 Светлая и тёмная темы
 
-## React Compiler
+## 🛠 Стек
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+**Core:**
+- React 19 + TypeScript 7
+- Vite 8
+- React Router 7 (Data Router)
 
-## Expanding the ESLint configuration
+**State:**
+- TanStack Query 5 — серверный стейт
+- Zustand 5 — клиентский стейт
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+**Forms & Validation:**
+- React Hook Form + Zod 4
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+**UI:**
+- Tailwind CSS 4
+- shadcn/ui (Base UI + Nova preset)
+- Lucide React
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+**Tooling:**
+- ESLint 10 (flat config) + Prettier
+- TypeScript strict mode
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+**Mocking:**
+- MSW (Mock Service Worker) — планируется
 
-```
+**Testing:**
+- Vitest + Testing Library — планируется
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+## 🏗 Архитектура
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+Проект построен по методологии **[Feature-Sliced Design](https://feature-sliced.design/)**.
 
 ```
+src/
+  app/        # точка входа, провайдеры, роутер, глобальные стили
+  pages/      # страницы под маршруты
+  widgets/    # самостоятельные UI-блоки (Header, KanbanBoard)
+  features/   # пользовательские сценарии (create-task, toggle-habit)
+  entities/   # бизнес-сущности (task, habit, user, board)
+  shared/     # переиспользуемое: ui, lib, api, config, types
+  mocks/      # MSW-хендлеры
+```
+
+**Правило импортов:** слой может импортировать только из слоёв ниже себя. Внутри слоя — только через `index.ts` (public API).
+
+## 🚀 Запуск
+
+```bash
+npm install
+npm run dev
+```
+
+Приложение откроется на `http://localhost:5173`.
+
+**Сборка:**
+```bash
+npm run build
+npm run preview
+```
+
+**Качество кода:**
+```bash
+npm run lint
+npm run format
+```
+
+## 🗺 Roadmap
+
+- [x] Инициализация проекта (Vite + React + TS)
+- [x] Настройка Tailwind CSS 4
+- [x] FSD-структура проекта
+- [x] Алиасы путей (`@/*`)
+- [x] shadcn/ui (Base UI + Nova)
+- [x] Настройка TanStack Query (QueryClientProvider)
+- [x] Базовый роутинг
+- [ ] Layout + Header + Sidebar
+- [ ] Страница Login (react-hook-form + Zod)
+- [ ] Авторизация через Zustand + MSW
+- [ ] CRUD задач
+- [ ] Канбан-доска с drag-and-drop
+- [ ] Трекер привычек
+- [ ] Графики прогресса
+- [ ] Шаринг досок
+- [ ] Тёмная тема
+- [ ] Тесты (Vitest + RTL)
+- [ ] CI (GitHub Actions)
+
+## 📝 Лицензия
+
+MIT

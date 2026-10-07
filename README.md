@@ -80,6 +80,8 @@ npm run format
 
 ## 🗺 Roadmap
 
+### Готово
+
 - [x] Инициализация проекта (Vite + React + TS)
 - [x] Настройка Tailwind CSS 4
 - [x] FSD-структура проекта
@@ -87,7 +89,13 @@ npm run format
 - [x] shadcn/ui (Base UI + Nova)
 - [x] Настройка TanStack Query (QueryClientProvider)
 - [x] Базовый роутинг
-- [ ] Layout + Header + Sidebar
+- [x] Layout + Header + Sidebar
+- [x] Светлая и тёмная темы
+
+### В планах
+
+- [ ] Типы и модели данных (Task, Habit, User, Board)
+- [ ] MSW — имитация API
 - [ ] Страница Login (react-hook-form + Zod)
 - [ ] Авторизация через Zustand + MSW
 - [ ] CRUD задач
@@ -95,9 +103,10 @@ npm run format
 - [ ] Трекер привычек
 - [ ] Графики прогресса
 - [ ] Шаринг досок
-- [ ] Тёмная тема
 - [ ] Тесты (Vitest + RTL)
 - [ ] CI (GitHub Actions)
+- [ ] Деплой (Vercel/Netlify)
+- [ ] i18n (русский / английский)
 
 ## 📝 Лицензия
 

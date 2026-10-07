@@ -92,10 +92,10 @@ npm run format
 - [x] Layout + Header + Sidebar
 - [x] Светлая и тёмная темы
 - [x] Типы и модели данных (Task, Habit, User, Board)
+- [x] MSW — имитация API
 
 ### В планах
 
-- [ ] MSW — имитация API
 - [ ] Страница Login (react-hook-form + Zod)
 - [ ] Авторизация через Zustand + MSW
 - [ ] CRUD задач

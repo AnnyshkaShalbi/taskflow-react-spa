@@ -1,3 +1,18 @@
+import type { Task } from '@/entities/task'
+
+const testTask: Task = {
+  id: '1',
+  title: 'Test',
+  status: 'todo',
+  priority: 'high',
+  boardId: 'b1',
+  tags: [],
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
+}
+
+console.log(testTask)
+
 export function DashboardPage() {
   return (
     <div className="p-8">

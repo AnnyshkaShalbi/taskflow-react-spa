@@ -91,10 +91,10 @@ npm run format
 - [x] Базовый роутинг
 - [x] Layout + Header + Sidebar
 - [x] Светлая и тёмная темы
+- [x] Типы и модели данных (Task, Habit, User, Board)
 
 ### В планах
 
-- [ ] Типы и модели данных (Task, Habit, User, Board)
 - [ ] MSW — имитация API
 - [ ] Страница Login (react-hook-form + Zod)
 - [ ] Авторизация через Zustand + MSW

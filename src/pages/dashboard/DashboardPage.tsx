@@ -17,13 +17,9 @@ export function DashboardPage() {
         <CreateTaskDialog />
       </div>
 
-      {/* Виджеты статистики */}
       <DashboardStats />
-
-      {/* График на всю ширину */}
       <TaskActivityChart />
 
-      {/* Задачи внизу на всю ширину */}
       <div>
         <h2 className="text-xl font-semibold tracking-tight mb-4">Последние задачи</h2>
         <TaskList />

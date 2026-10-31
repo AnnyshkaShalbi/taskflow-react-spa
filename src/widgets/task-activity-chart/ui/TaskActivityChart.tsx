@@ -34,7 +34,6 @@ export function TaskActivityChart() {
   }, [tasks])
 
   return (
-    // Убрали col-span, теперь компонент занимает всю ширину, которую ему даст родитель
     <Card className="w-full">
       <CardHeader>
         <CardTitle>Активность за неделю</CardTitle>
@@ -70,14 +69,12 @@ export function TaskActivityChart() {
             />
             <Legend wrapperStyle={{ paddingTop: '20px' }} />
             
-            {/* Фиолетовый цвет для "Создано" */}
             <Bar 
               dataKey="Создано" 
               fill="#8b5cf6" 
               radius={[4, 4, 0, 0]} 
               maxBarSize={60}
             />
-            {/* Изумрудный цвет для "Выполнено" */}
             <Bar 
               dataKey="Выполнено" 
               fill="#10b981" 

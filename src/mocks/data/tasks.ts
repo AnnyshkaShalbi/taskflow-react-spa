@@ -1,6 +1,5 @@
 import type { Task } from '@/entities/task'
 
-// Хелпер для генерации дат (сколько дней назад от сегодня)
 const getDate = (daysAgo: number): string => {
   const d = new Date()
   d.setDate(d.getDate() - daysAgo)
@@ -16,8 +15,8 @@ export const mockTasks: Task[] = [
     priority: 'high',
     boardId: 'board-1',
     tags: ['setup'],
-    createdAt: getDate(6), // 6 дней назад
-    updatedAt: getDate(0), // Сегодня
+    createdAt: getDate(6),
+    updatedAt: getDate(0),
   },
   {
     id: 'task-2',
@@ -45,12 +44,12 @@ export const mockTasks: Task[] = [
     id: 'task-4',
     title: 'Починить тёмную тему',
     description: 'При перезагрузке страницы тема сбрасывается на светлую',
-    status: 'done', // Сделали done, чтобы график заполнился
+    status: 'done', 
     priority: 'medium',
     boardId: 'board-1',
     tags: ['bug', 'ui'],
     createdAt: getDate(3),
-    updatedAt: getDate(1), // Выполнено вчера
+    updatedAt: getDate(1), 
   },
   {
     id: 'task-5',
@@ -61,7 +60,7 @@ export const mockTasks: Task[] = [
     boardId: 'board-1',
     tags: ['docs'],
     createdAt: getDate(2),
-    updatedAt: getDate(0), // Выполнено сегодня
+    updatedAt: getDate(0), 
   },
   {
     id: 'task-6',
@@ -82,7 +81,7 @@ export const mockTasks: Task[] = [
     priority: 'low',
     boardId: 'board-2',
     tags: ['personal'],
-    createdAt: getDate(0), // Создано сегодня
+    createdAt: getDate(0), 
     updatedAt: getDate(0),
   },
 ]

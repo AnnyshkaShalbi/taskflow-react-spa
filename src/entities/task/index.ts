@@ -23,3 +23,4 @@ export { useUpdateTask } from './api/use-update-task'
 export { useDeleteTask } from './api/use-delete-task'
 
 export { TaskCard } from './ui/TaskCard'
+export { StatusSelect } from './ui/StatusSelect'

@@ -48,16 +48,15 @@ export function CreateTaskDialog() {
         boardId: 'board-1',
         tags: [],
     },
-    })
+  })
 
-  // 1. onSubmit принимает ПОЛНЫЙ тип (CreateTaskFormValues), а не входной
     const onSubmit = (values: CreateTaskFormValues) => {
-    mutate(values, {
-        onSuccess: () => {
-        form.reset()
-        setOpen(false)
-        },
-    })
+        mutate(values, {
+            onSuccess: () => {
+            form.reset()
+            setOpen(false)
+            },
+        })
     }
 
   return (
@@ -73,8 +72,7 @@ export function CreateTaskDialog() {
         </DialogHeader>
 
         <Form {...form}>
-          // 2. В JSX вызов handleSubmit БЕЗ дженериков
-<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
               name="title"

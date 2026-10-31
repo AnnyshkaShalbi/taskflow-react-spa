@@ -2,17 +2,38 @@ import { http, HttpResponse, delay } from 'msw'
 import type { Task, CreateTaskInput, UpdateTaskInput } from '@/entities/task'
 import { mockTasks } from '../data/tasks'
 
-let tasks: Task[] = [...mockTasks]
+const STORAGE_KEY = 'taskflow-mock-tasks'
+
+// Вспомогательная функция: читает задачи из localStorage (или отдаёт seed)
+function getTasks(): Task[] {
+  const stored = localStorage.getItem(STORAGE_KEY)
+  if (stored) {
+    try {
+      return JSON.parse(stored) as Task[]
+    } catch {
+      return [...mockTasks]
+    }
+  }
+  return [...mockTasks]
+}
+
+// Вспомогательная функция: сохраняет задачи в localStorage
+function saveTasks(tasks: Task[]) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks))
+}
 
 export const taskHandlers = [
+  // GET /api/tasks — список
   http.get('/api/tasks', async () => {
     await delay(300)
-    return HttpResponse.json(tasks)
+    return HttpResponse.json(getTasks())
   }),
 
+  // POST /api/tasks — создание
   http.post('/api/tasks', async ({ request }) => {
     await delay(300)
     const input = (await request.json()) as CreateTaskInput
+    const tasks = getTasks()
 
     const newTask: Task = {
       id: crypto.randomUUID(),
@@ -29,17 +50,20 @@ export const taskHandlers = [
     }
 
     tasks.push(newTask)
+    saveTasks(tasks)
     return HttpResponse.json(newTask, { status: 201 })
   }),
 
+  // PATCH /api/tasks/:id — обновление
   http.patch('/api/tasks/:id', async ({ params, request }) => {
     await delay(300)
     const { id } = params
     const patch = (await request.json()) as UpdateTaskInput
+    const tasks = getTasks()
     const index = tasks.findIndex((t) => t.id === id)
 
     if (index === -1) {
-      return new HttpResponse(null, { status: 404 })
+      return HttpResponse.json({ message: 'Задача не найдена' }, { status: 404 })
     }
 
     tasks[index] = {
@@ -48,13 +72,16 @@ export const taskHandlers = [
       updatedAt: new Date().toISOString(),
     }
 
+    saveTasks(tasks)
     return HttpResponse.json(tasks[index])
   }),
 
+  // DELETE /api/tasks/:id — удаление
   http.delete('/api/tasks/:id', async ({ params }) => {
     await delay(300)
     const { id } = params
-    tasks = tasks.filter((t) => t.id !== id)
+    const tasks = getTasks().filter((t) => t.id !== id)
+    saveTasks(tasks)
     return new HttpResponse(null, { status: 204 })
   }),
 ]

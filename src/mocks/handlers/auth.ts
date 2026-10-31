@@ -3,38 +3,47 @@ import type { LoginInput, AuthResponse } from '@/entities/user'
 import { mockUsers } from '../data/users'
 import { mockCredentials } from '../data/auth'
 
-// In-memory хранилище активных токенов: token -> userId
-const activeTokens = new Map<string, string>()
+// Имитация JWT: кодируем userId в base64.
+// Это stateless-подход: серверу не нужно хранить сессии в памяти.
+function createToken(userId: string): string {
+  return btoa(userId)
+}
+
+function getUserIdFromToken(token: string): string | null {
+  try {
+    const userId = atob(token)
+    return userId || null
+  } catch {
+    return null
+  }
+}
 
 export const authHandlers = [
   // POST /api/auth/login — вход
   http.post('/api/auth/login', async ({ request }) => {
-    await delay(500) // имитируем реальный сервер — логин всегда медленный
+    await delay(500)
 
     const { email, password } = (await request.json()) as LoginInput
 
-    // 1. Проверяем, есть ли такой email
     const expectedPassword = mockCredentials[email]
-    if (!expectedPassword) {
-      return HttpResponse.json({ message: 'Неверный email или пароль' }, { status: 401 })
+    if (!expectedPassword || expectedPassword !== password) {
+      return HttpResponse.json(
+        { message: 'Неверный email или пароль' },
+        { status: 401 },
+      )
     }
 
-    // 2. Проверяем пароль
-    if (expectedPassword !== password) {
-      return HttpResponse.json({ message: 'Неверный email или пароль' }, { status: 401 })
-    }
-
-    // 3. Находим пользователя
     const user = mockUsers.find((u) => u.email === email)
     if (!user) {
-      return HttpResponse.json({ message: 'Неверный email или пароль' }, { status: 401 })
+      return HttpResponse.json(
+        { message: 'Неверный email или пароль' },
+        { status: 401 },
+      )
     }
 
-    // 4. Генерируем токен и запоминаем его
-    const token = crypto.randomUUID()
-    activeTokens.set(token, user.id)
-
+    const token = createToken(user.id)
     const response: AuthResponse = { user, token }
+    
     return HttpResponse.json(response)
   }),
 
@@ -42,9 +51,14 @@ export const authHandlers = [
   http.get('/api/auth/me', async ({ request }) => {
     await delay(300)
 
-    const userId = getUserIdFromRequest(request)
-    if (!userId) {
+    const token = getTokenFromRequest(request)
+    if (!token) {
       return HttpResponse.json({ message: 'Не авторизован' }, { status: 401 })
+    }
+
+    const userId = getUserIdFromToken(token)
+    if (!userId) {
+      return HttpResponse.json({ message: 'Невалидный токен' }, { status: 401 })
     }
 
     const user = mockUsers.find((u) => u.id === userId)
@@ -55,30 +69,19 @@ export const authHandlers = [
     return HttpResponse.json(user)
   }),
 
-  // POST /api/auth/logout — выход (удаляем токен)
-  http.post('/api/auth/logout', async ({ request }) => {
+  // POST /api/auth/logout — выход
+  http.post('/api/auth/logout', async () => {
     await delay(200)
-
-    const token = getTokenFromRequest(request)
-    if (token) {
-      activeTokens.delete(token)
-    }
-
+    // При stateless-токенах сервер просто подтверждает выход.
+    // Клиент сам удаляет токен из localStorage и Zustand.
     return new HttpResponse(null, { status: 204 })
   }),
 ]
 
-// ---- Хелперы ----
+// ---- Хелпер ----
 
 function getTokenFromRequest(request: Request): string | null {
   const authHeader = request.headers.get('Authorization')
-  if (!authHeader) return null
-  if (!authHeader.startsWith('Bearer ')) return null
-  return authHeader.slice(7) // отрезаем "Bearer "
-}
-
-function getUserIdFromRequest(request: Request): string | null {
-  const token = getTokenFromRequest(request)
-  if (!token) return null
-  return activeTokens.get(token) ?? null
+  if (!authHeader || !authHeader.startsWith('Bearer ')) return null
+  return authHeader.slice(7)
 }

@@ -99,24 +99,20 @@ function FormLabel({
   )
 }
 
-function FormControl({ children, ...props }: React.ComponentProps<'div'>) {
+function FormControl({ children }: { children: React.ReactNode }) {
   const { error, formItemId, formDescriptionId, formMessageId } = useFormField()
-
   const child = React.Children.only(children)
 
   if (!React.isValidElement(child)) {
-    return child
+    return <>{child}</>
   }
 
-  const { children: _childChildren, ...restProps } = props as any
-
-  return React.cloneElement(child as React.ReactElement, {
+  return React.cloneElement(child as React.ReactElement<Record<string, unknown>>, {
     id: formItemId,
     'aria-describedby': !error
-      ? `${formDescriptionId}`
+      ? formDescriptionId
       : `${formDescriptionId} ${formMessageId}`,
     'aria-invalid': !!error,
-    ...restProps,
   })
 }
 

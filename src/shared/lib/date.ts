@@ -28,7 +28,8 @@ export function calculateStreak(completedDates: string[]): number {
   }
 
   let streak = 0
-  let currentDate = sortedDates.includes(todayStr) ? today : yesterday
+  // Используем const и создаем копию объекта Date через new Date()
+  const currentDate = new Date(sortedDates.includes(todayStr) ? today : yesterday)
 
   // Идем назад по дням и считаем непрерывную цепочку
   while (true) {

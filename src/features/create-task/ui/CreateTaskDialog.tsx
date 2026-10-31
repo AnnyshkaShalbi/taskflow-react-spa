@@ -66,7 +66,7 @@ export function CreateTaskDialog() {
         Создать задачу
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-106.25">
         <DialogHeader>
           <DialogTitle>Новая задача</DialogTitle>
         </DialogHeader>

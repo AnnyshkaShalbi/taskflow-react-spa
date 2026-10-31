@@ -2,11 +2,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card'
 import { Badge } from '@/shared/ui/badge'
 import { cn } from 'cn'
 import { StatusSelect } from './StatusSelect'
+import type { ReactNode } from 'react'
+
 import type { Task, TaskPriority } from '../model/types'
 
 type TaskCardProps = {
   task: Task
   className?: string
+  actions?: ReactNode
 }
 
 const priorityConfig: Record<TaskPriority, { label: string; className: string }> = {
@@ -15,7 +18,7 @@ const priorityConfig: Record<TaskPriority, { label: string; className: string }>
   'high': { label: 'Высокий', className: 'text-red-600 border-red-600/30' },
 }
 
-export function TaskCard({ task, className }: TaskCardProps) {
+export function TaskCard({ task, className, actions }: TaskCardProps) {
   return (
     <Card className={cn('flex flex-col hover:shadow-md transition-shadow', className)}>
       <CardHeader className="pb-3">
@@ -26,6 +29,7 @@ export function TaskCard({ task, className }: TaskCardProps) {
           <Badge variant="outline" className={cn('shrink-0', priorityConfig[task.priority].className)}>
             {priorityConfig[task.priority].label}
           </Badge>
+          {actions}
         </div>
       </CardHeader>
       

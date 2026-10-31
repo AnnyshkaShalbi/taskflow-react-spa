@@ -1,6 +1,7 @@
 import { useTasks, TaskCard } from '@/entities/task'
 import { Skeleton } from '@/shared/ui/skeleton'
 import { ClipboardList } from 'lucide-react'
+import { DeleteTaskButton } from '@/features/delete-task' 
 
 export function TaskList() {
   const { data: tasks, isLoading, isError } = useTasks()
@@ -51,7 +52,7 @@ export function TaskList() {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {tasks.map((task) => (
-        <TaskCard key={task.id} task={task} />
+        <TaskCard key={task.id} task={task} actions={<DeleteTaskButton taskId={task.id} />} />
       ))}
     </div>
   )

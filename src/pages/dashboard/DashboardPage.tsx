@@ -1,17 +1,16 @@
-import { useTasks } from '@/entities/task'
+import { TaskList } from '@/widgets/task-list'
 
 export function DashboardPage() {
-  const { data: tasks, isLoading, isError } = useTasks()
-
-  if (isLoading) return <div className="p-8">Загрузка задач...</div>
-  if (isError) return <div className="p-8 text-red-500">Ошибка загрузки</div>
-
   return (
-    <div className="p-8">
-      <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
-      <pre className="bg-muted p-4 rounded-md text-sm overflow-auto">
-        {JSON.stringify(tasks, null, 2)}
-      </pre>
+    <div className="p-8 max-w-7xl mx-auto space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">Мои задачи</h1>
+        <p className="text-muted-foreground mt-1">
+          Управляйте своими задачами и отслеживайте прогресс.
+        </p>
+      </div>
+
+      <TaskList />
     </div>
   )
 }

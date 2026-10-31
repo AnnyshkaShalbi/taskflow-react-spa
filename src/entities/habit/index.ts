@@ -1,3 +1,7 @@
 export type { HabitFrequency, Habit, CreateHabitInput, UpdateHabitInput } from './model/types'
 export { habitFrequencySchema, createHabitSchema } from './model/shema'
 export type { CreateHabitFormValues } from './model/shema'
+export { habitsApi } from './api/habits.api'
+export { useHabits } from './api/use-habits'
+export { useToggleHabit } from './api/use-toggle-habit'
+export { HabitCard } from './ui/HabitCard'

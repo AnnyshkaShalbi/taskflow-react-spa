@@ -2,19 +2,38 @@ import { http, HttpResponse, delay } from 'msw'
 import type { Habit, CreateHabitInput, UpdateHabitInput } from '@/entities/habit'
 import { mockHabits } from '../data/habits'
 
-let habits: Habit[] = [...mockHabits]
+const STORAGE_KEY = 'taskflow-mock-habits'
+
+// Читаем привычки из localStorage (или отдаем исходные моки)
+function getHabits(): Habit[] {
+  const stored = localStorage.getItem(STORAGE_KEY)
+  if (stored) {
+    try {
+      return JSON.parse(stored) as Habit[]
+    } catch {
+      return [...mockHabits]
+    }
+  }
+  return [...mockHabits]
+}
+
+// Сохраняем привычки в localStorage
+function saveHabits(habits: Habit[]) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(habits))
+}
 
 export const habitHandlers = [
   // GET /api/habits — список всех привычек
   http.get('/api/habits', async () => {
     await delay(300)
-    return HttpResponse.json(habits)
+    return HttpResponse.json(getHabits())
   }),
 
   // GET /api/habits/:id — одна привычка
   http.get('/api/habits/:id', async ({ params }) => {
     await delay(200)
     const { id } = params
+    const habits = getHabits()
     const habit = habits.find((h) => h.id === id)
 
     if (!habit) {
@@ -28,6 +47,7 @@ export const habitHandlers = [
   http.post('/api/habits', async ({ request }) => {
     await delay(300)
     const input = (await request.json()) as CreateHabitInput
+    const habits = getHabits()
 
     const newHabit: Habit = {
       id: crypto.randomUUID(),
@@ -42,6 +62,7 @@ export const habitHandlers = [
     }
 
     habits.push(newHabit)
+    saveHabits(habits)
     return HttpResponse.json(newHabit, { status: 201 })
   }),
 
@@ -50,6 +71,7 @@ export const habitHandlers = [
     await delay(300)
     const { id } = params
     const patch = (await request.json()) as UpdateHabitInput
+    const habits = getHabits()
     const index = habits.findIndex((h) => h.id === id)
 
     if (index === -1) {
@@ -62,6 +84,7 @@ export const habitHandlers = [
       updatedAt: new Date().toISOString(),
     }
 
+    saveHabits(habits)
     return HttpResponse.json(habits[index])
   }),
 
@@ -69,7 +92,10 @@ export const habitHandlers = [
   http.delete('/api/habits/:id', async ({ params }) => {
     await delay(300)
     const { id } = params
-    habits = habits.filter((h) => h.id !== id)
+    const habits = getHabits()
+    const updatedHabits = habits.filter((h) => h.id !== id)
+    
+    saveHabits(updatedHabits)
     return new HttpResponse(null, { status: 204 })
   }),
 
@@ -78,6 +104,7 @@ export const habitHandlers = [
     await delay(200)
     const { id } = params
     const { date } = (await request.json()) as { date: string }
+    const habits = getHabits()
     const index = habits.findIndex((h) => h.id === id)
 
     if (index === -1) {
@@ -97,6 +124,7 @@ export const habitHandlers = [
       updatedAt: new Date().toISOString(),
     }
 
+    saveHabits(habits)
     return HttpResponse.json(habits[index])
   }),
 ]

@@ -92,12 +92,14 @@ npm run format
 - [x] Layout + Header + Sidebar
 - [x] Светлая и тёмная темы
 - [x] Типы и модели данных (Task, Habit, User, Board)
-- [x] MSW — имитация API
+- [x] MSW — имитация API (CRUD + Auth)
+- [x] Авторизация через Zustand + MSW
+- [x] Страница Login (react-hook-form + Zod)
+- [x] Защита маршрутов (ProtectedRoute)
+- [x] Автовосстановление сессии (самодостаточный токен)
 
 ### В планах
 
-- [ ] Страница Login (react-hook-form + Zod)
-- [ ] Авторизация через Zustand + MSW
 - [ ] CRUD задач
 - [ ] Канбан-доска с drag-and-drop
 - [ ] Трекер привычек

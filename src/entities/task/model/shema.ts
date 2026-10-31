@@ -14,4 +14,8 @@ export const createTaskSchema = z.object({
   tags: z.array(z.string()).default([]),
 })
 
-export type CreateTaskFormValues = z.infer<typeof createTaskSchema>
+// Тип того, что приходит С СЕРВЕРА (с дефолтами)
+export type CreateTaskFormValues = z.output<typeof createTaskSchema>
+
+// Тип того, что мы заполняем В ФОРМЕ (где tags может отсутствовать)
+export type CreateTaskInputValues = z.input<typeof createTaskSchema>

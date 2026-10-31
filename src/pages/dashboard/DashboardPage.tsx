@@ -11,7 +11,6 @@ export function DashboardPage() {
             Управляйте своими задачами и отслеживайте прогресс.
           </p>
         </div>
-        {/* Вот она — наша кнопка создания! */}
         <CreateTaskDialog />
       </div>
 

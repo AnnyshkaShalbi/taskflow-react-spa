@@ -35,7 +35,7 @@ export function StatusSelect({ task }: StatusSelectProps) {
       onValueChange={handleStatusChange}
       disabled={isPending}
     >
-      <SelectTrigger className="h-8 w-[140px] text-xs">
+      <SelectTrigger className="h-8 w-35 text-xs">
         <SelectValue />
       </SelectTrigger>
       <SelectContent>

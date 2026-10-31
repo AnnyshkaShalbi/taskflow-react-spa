@@ -45,3 +45,25 @@ export function calculateStreak(completedDates: string[]): number {
 
   return streak
 }
+
+// Возвращает массив из 7 объектов с датами за последнюю неделю
+export function getLast7Days(): { dateStr: string; label: string }[] {
+  const days = []
+  const today = new Date()
+  
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(today)
+    d.setDate(d.getDate() - i)
+    
+    const year = d.getFullYear()
+    const month = String(d.getMonth() + 1).padStart(2, '0')
+    const day = String(d.getDate()).padStart(2, '0')
+    const dateStr = `${year}-${month}-${day}`
+    
+    // Красивая метка для оси X (например, "12 окт")
+    const label = d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })
+    
+    days.push({ dateStr, label })
+  }
+  return days
+}

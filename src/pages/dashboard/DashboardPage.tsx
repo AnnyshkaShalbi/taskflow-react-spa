@@ -1,6 +1,7 @@
 import { TaskList } from '@/widgets/task-list'
 import { CreateTaskDialog } from '@/features/create-task'
 import { DashboardStats } from '@/widgets/dashboard-stats'
+import { TaskActivityChart } from '@/widgets/task-activity-chart'
 
 export function DashboardPage() {
   return (
@@ -19,7 +20,10 @@ export function DashboardPage() {
       {/* Виджеты статистики */}
       <DashboardStats />
 
-      {/* Задачи */}
+      {/* График на всю ширину */}
+      <TaskActivityChart />
+
+      {/* Задачи внизу на всю ширину */}
       <div>
         <h2 className="text-xl font-semibold tracking-tight mb-4">Последние задачи</h2>
         <TaskList />

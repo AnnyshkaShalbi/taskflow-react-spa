@@ -1,5 +1,12 @@
 import type { Task } from '@/entities/task'
 
+// Хелпер для генерации дат (сколько дней назад от сегодня)
+const getDate = (daysAgo: number): string => {
+  const d = new Date()
+  d.setDate(d.getDate() - daysAgo)
+  return d.toISOString()
+}
+
 export const mockTasks: Task[] = [
   {
     id: 'task-1',
@@ -9,8 +16,8 @@ export const mockTasks: Task[] = [
     priority: 'high',
     boardId: 'board-1',
     tags: ['setup'],
-    createdAt: '2026-10-01T10:00:00.000Z',
-    updatedAt: '2026-10-07T14:30:00.000Z',
+    createdAt: getDate(6), // 6 дней назад
+    updatedAt: getDate(0), // Сегодня
   },
   {
     id: 'task-2',
@@ -20,8 +27,8 @@ export const mockTasks: Task[] = [
     priority: 'high',
     boardId: 'board-1',
     tags: ['frontend', 'ui'],
-    createdAt: '2026-10-02T09:15:00.000Z',
-    updatedAt: '2026-10-02T09:15:00.000Z',
+    createdAt: getDate(5),
+    updatedAt: getDate(5),
   },
   {
     id: 'task-3',
@@ -31,19 +38,19 @@ export const mockTasks: Task[] = [
     priority: 'medium',
     boardId: 'board-1',
     tags: ['testing'],
-    createdAt: '2026-10-03T11:00:00.000Z',
-    updatedAt: '2026-10-03T11:00:00.000Z',
+    createdAt: getDate(4),
+    updatedAt: getDate(4),
   },
   {
     id: 'task-4',
     title: 'Починить тёмную тему',
     description: 'При перезагрузке страницы тема сбрасывается на светлую',
-    status: 'in-progress',
+    status: 'done', // Сделали done, чтобы график заполнился
     priority: 'medium',
     boardId: 'board-1',
     tags: ['bug', 'ui'],
-    createdAt: '2026-10-04T08:30:00.000Z',
-    updatedAt: '2026-10-06T16:45:00.000Z',
+    createdAt: getDate(3),
+    updatedAt: getDate(1), // Выполнено вчера
   },
   {
     id: 'task-5',
@@ -53,8 +60,8 @@ export const mockTasks: Task[] = [
     priority: 'low',
     boardId: 'board-1',
     tags: ['docs'],
-    createdAt: '2026-09-28T12:00:00.000Z',
-    updatedAt: '2026-10-01T19:20:00.000Z',
+    createdAt: getDate(2),
+    updatedAt: getDate(0), // Выполнено сегодня
   },
   {
     id: 'task-6',
@@ -64,8 +71,8 @@ export const mockTasks: Task[] = [
     priority: 'medium',
     boardId: 'board-2',
     tags: ['learning'],
-    createdAt: '2026-09-25T07:00:00.000Z',
-    updatedAt: '2026-09-30T21:15:00.000Z',
+    createdAt: getDate(1),
+    updatedAt: getDate(1),
   },
   {
     id: 'task-7',
@@ -75,7 +82,7 @@ export const mockTasks: Task[] = [
     priority: 'low',
     boardId: 'board-2',
     tags: ['personal'],
-    createdAt: '2026-10-06T18:00:00.000Z',
-    updatedAt: '2026-10-06T18:00:00.000Z',
+    createdAt: getDate(0), // Создано сегодня
+    updatedAt: getDate(0),
   },
 ]

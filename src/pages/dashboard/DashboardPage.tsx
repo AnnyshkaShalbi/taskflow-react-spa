@@ -1,18 +1,17 @@
-import { useMe } from '@/entities/user'
-import { useAuthStore } from '@/entities/user'
+import { useTasks } from '@/entities/task'
 
 export function DashboardPage() {
-  const status = useAuthStore((s) => s.status)
-  const user = useAuthStore((s) => s.user)
-  const { isLoading, isFetching } = useMe()
+  const { data: tasks, isLoading, isError } = useTasks()
+
+  if (isLoading) return <div className="p-8">Загрузка задач...</div>
+  if (isError) return <div className="p-8 text-red-500">Ошибка загрузки</div>
 
   return (
-    <div className="p-8 space-y-2">
-      <h1 className="text-3xl font-bold">Dashboard</h1>
-      <p>Status: {status}</p>
-      <p>User: {user?.name ?? 'нет'}</p>
-      <p>isLoading: {String(isLoading)}</p>
-      <p>isFetching: {String(isFetching)}</p>
+    <div className="p-8">
+      <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
+      <pre className="bg-muted p-4 rounded-md text-sm overflow-auto">
+        {JSON.stringify(tasks, null, 2)}
+      </pre>
     </div>
   )
 }

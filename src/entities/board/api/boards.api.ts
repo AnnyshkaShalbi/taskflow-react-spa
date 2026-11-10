@@ -12,4 +12,10 @@ export const boardsApi = {
       token,
     })
   },
+  delete: (id: string, token: string): Promise<void> => {
+    return http<void>(`/boards/${id}`, {
+      method: 'DELETE',
+      token,
+    })
+  },
 }

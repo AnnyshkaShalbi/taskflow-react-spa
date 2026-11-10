@@ -5,7 +5,7 @@ import { mockTasks } from '../data/tasks'
 const STORAGE_KEY = 'taskflow-mock-tasks'
 
 // Вспомогательная функция: читает задачи из localStorage (или отдаёт seed)
-function getTasks(): Task[] {
+export function getTasks(): Task[] {
   const stored = localStorage.getItem(STORAGE_KEY)
   if (stored) {
     try {
@@ -18,7 +18,7 @@ function getTasks(): Task[] {
 }
 
 // Вспомогательная функция: сохраняет задачи в localStorage
-function saveTasks(tasks: Task[]) {
+export function saveTasks(tasks: Task[]) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks))
 }
 

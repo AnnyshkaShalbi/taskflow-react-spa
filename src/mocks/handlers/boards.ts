@@ -1,15 +1,35 @@
 import { http, HttpResponse, delay } from 'msw'
 import type { Board, CreateBoardInput } from '@/entities/board'
 import { mockBoards } from '../data/boards'
+// Импортируем функции для работы с задачами, чтобы сделать каскадное удаление
+import { getTasks, saveTasks } from './tasks'
 
-let boards: Board[] = [...mockBoards]
+const STORAGE_KEY = 'taskflow-mock-boards'
+
+// Читаем доски из localStorage
+function getBoards(): Board[] {
+  const stored = localStorage.getItem(STORAGE_KEY)
+  if (stored) {
+    try {
+      return JSON.parse(stored) as Board[]
+    } catch {
+      return [...mockBoards]
+    }
+  }
+  return [...mockBoards]
+}
+
+// Сохраняем доски в localStorage
+function saveBoards(boards: Board[]) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(boards))
+}
 
 export const boardHandlers = [
   // GET /api/boards — список всех досок текущего пользователя
-  // (в моке считаем, что текущий — user-1)
   http.get('/api/boards', async () => {
     await delay(300)
     const currentUserId = 'user-1'
+    const boards = getBoards()
     const userBoards = boards.filter(
       (b) => b.ownerId === currentUserId || b.memberIds.includes(currentUserId),
     )
@@ -20,6 +40,7 @@ export const boardHandlers = [
   http.get('/api/boards/:id', async ({ params }) => {
     await delay(200)
     const { id } = params
+    const boards = getBoards()
     const board = boards.find((b) => b.id === id)
 
     if (!board) {
@@ -33,12 +54,13 @@ export const boardHandlers = [
   http.post('/api/boards', async ({ request }) => {
     await delay(300)
     const input = (await request.json()) as CreateBoardInput
+    const boards = getBoards()
 
     const newBoard: Board = {
       id: crypto.randomUUID(),
       title: input.title,
       description: input.description,
-      ownerId: 'user-1', // текущий пользователь
+      ownerId: 'user-1',
       memberIds: [],
       isPublic: input.isPublic ?? false,
       createdAt: new Date().toISOString(),
@@ -46,6 +68,7 @@ export const boardHandlers = [
     }
 
     boards.push(newBoard)
+    saveBoards(boards)
     return HttpResponse.json(newBoard, { status: 201 })
   }),
 
@@ -54,6 +77,7 @@ export const boardHandlers = [
     await delay(300)
     const { id } = params
     const patch = (await request.json()) as Partial<Board>
+    const boards = getBoards()
     const index = boards.findIndex((b) => b.id === id)
 
     if (index === -1) {
@@ -66,14 +90,24 @@ export const boardHandlers = [
       updatedAt: new Date().toISOString(),
     }
 
+    saveBoards(boards)
     return HttpResponse.json(boards[index])
   }),
 
-  // DELETE /api/boards/:id — удаление
+  // DELETE /api/boards/:id — удаление (с каскадным удалением задач)
   http.delete('/api/boards/:id', async ({ params }) => {
     await delay(300)
     const { id } = params
-    boards = boards.filter((b) => b.id !== id)
+    
+    // 1. Удаляем саму доску
+    const boards = getBoards()
+    saveBoards(boards.filter((b) => b.id !== id))
+
+    // 2. Каскадно удаляем задачи этой доски (используем импортированные функции)
+    const tasks = getTasks()
+    const updatedTasks = tasks.filter((t) => t.boardId !== id)
+    saveTasks(updatedTasks)
+
     return new HttpResponse(null, { status: 204 })
   }),
 
@@ -82,6 +116,7 @@ export const boardHandlers = [
     await delay(300)
     const { id } = params
     const { userId } = (await request.json()) as { userId: string }
+    const boards = getBoards()
     const index = boards.findIndex((b) => b.id === id)
 
     if (index === -1) {
@@ -100,6 +135,7 @@ export const boardHandlers = [
       updatedAt: new Date().toISOString(),
     }
 
+    saveBoards(boards)
     return HttpResponse.json(boards[index])
   }),
 
@@ -107,6 +143,7 @@ export const boardHandlers = [
   http.delete('/api/boards/:id/members/:userId', async ({ params }) => {
     await delay(300)
     const { id, userId } = params
+    const boards = getBoards()
     const index = boards.findIndex((b) => b.id === id)
 
     if (index === -1) {
@@ -119,6 +156,7 @@ export const boardHandlers = [
       updatedAt: new Date().toISOString(),
     }
 
+    saveBoards(boards)
     return HttpResponse.json(boards[index])
   }),
 ]

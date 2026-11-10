@@ -1,3 +1,7 @@
 export type { CreateBoardInput, Board } from './model/types'
 export { createBoardSchema } from './model/shema'
 export type { CreateBoardFormValues } from './model/shema'
+export { useBoardStore } from './model/store'
+export { boardsApi } from './api/boards.api'
+export { useBoards } from './api/use-boards'
+export { useCreateBoard } from './api/use-create-board'

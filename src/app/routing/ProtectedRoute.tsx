@@ -6,8 +6,6 @@ export function ProtectedRoute() {
   const location = useLocation()
 
   if (!token) {
-    // Редиректим на логин, сохраняя текущий путь, 
-    // чтобы после входа вернуть пользователя туда, куда он шёл
     return <Navigate to="/login" state={{ from: location }} replace />
   }
 

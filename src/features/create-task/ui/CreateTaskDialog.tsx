@@ -33,10 +33,12 @@ import {
   FormLabel,
   FormMessage,
 } from '@/shared/ui/form'
+import { useBoardStore } from '@/entities/board'
 
 export function CreateTaskDialog() {
   const [open, setOpen] = useState(false)
   const { mutate, isPending } = useCreateTask()
+  const activeBoardId = useBoardStore((s) => s.activeBoardId)
 
   const form = useForm<CreateTaskInputValues, unknown, CreateTaskFormValues>({
     resolver: zodResolver(createTaskSchema),
@@ -45,19 +47,22 @@ export function CreateTaskDialog() {
         description: '',
         status: 'todo',
         priority: 'medium',
-        boardId: 'board-1',
+        boardId: activeBoardId,
         tags: [],
     },
   })
 
-    const onSubmit = (values: CreateTaskFormValues) => {
-        mutate(values, {
-            onSuccess: () => {
-            form.reset()
-            setOpen(false)
-            },
-        })
-    }
+  const onSubmit = (values: CreateTaskFormValues) => {
+    mutate(
+      { ...values, boardId: activeBoardId }, 
+      {
+        onSuccess: () => {
+          form.reset()
+          setOpen(false)
+        },
+      }
+    )
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

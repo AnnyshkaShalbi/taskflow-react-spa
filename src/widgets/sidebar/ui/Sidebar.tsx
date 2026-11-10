@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router'
 import { LayoutDashboard, KanbanSquare, Repeat, Settings } from 'lucide-react'
 import { cn } from 'cn'
+import { BoardSwitcher } from './BoardSwitcher' 
 
 const navItems = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard, end: true },
@@ -12,6 +13,10 @@ const navItems = [
 export function Sidebar() {
   return (
     <aside className="hidden md:flex w-56 flex-col border-r bg-background p-3">
+      <div className="mb-6">
+        <BoardSwitcher />
+      </div>
+
       <nav className="flex flex-col gap-1 text-sm">
         {navItems.map(({ to, label, icon: Icon, end }) => (
           <NavLink

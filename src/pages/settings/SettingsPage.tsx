@@ -1,5 +1,8 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs'
 import { User, Palette, ShieldAlert } from 'lucide-react'
+import { ProfileForm } from '@/features/update-profile'
+import { ThemeToggle } from '@/features/theme-toggle'
+import { LogoutButton } from '@/features/logout'
 
 export function SettingsPage() {
   return (
@@ -30,23 +33,54 @@ export function SettingsPage() {
 
         {/* Контент вкладок (пока с заглушками) */}
         <TabsContent value="profile">
-          <div className="border rounded-xl p-6">
-            <h2 className="text-xl font-semibold mb-2">Профиль</h2>
-            <p className="text-muted-foreground">Здесь будет форма изменения имени.</p>
+          <div className="border rounded-xl p-6 space-y-6">
+            <div>
+              <h2 className="text-xl font-semibold">Профиль</h2>
+              <p className="text-sm text-muted-foreground">
+                Обновите ваше имя. Оно будет отображаться в шапке приложения.
+              </p>
+            </div>
+            <ProfileForm />
           </div>
         </TabsContent>
 
         <TabsContent value="appearance">
-          <div className="border rounded-xl p-6">
-            <h2 className="text-xl font-semibold mb-2">Внешний вид</h2>
-            <p className="text-muted-foreground">Здесь будет выбор темы.</p>
+          <div className="border rounded-xl p-6 space-y-6">
+            <div>
+              <h2 className="text-xl font-semibold">Внешний вид</h2>
+              <p className="text-sm text-muted-foreground">
+                Настройте тему интерфейса под себя.
+              </p>
+            </div>
+            
+            <div className="flex items-center justify-between p-4 border rounded-lg">
+              <div>
+                <p className="font-medium">Тема оформления</p>
+                <p className="text-sm text-muted-foreground">Переключить светлую и тёмную тему</p>
+              </div>
+              <ThemeToggle />
+            </div>
           </div>
         </TabsContent>
 
         <TabsContent value="account">
-          <div className="border rounded-xl p-6">
-            <h2 className="text-xl font-semibold mb-2">Аккаунт</h2>
-            <p className="text-muted-foreground">Здесь будет кнопка выхода из системы.</p>
+          <div className="border border-destructive/20 rounded-xl p-6 space-y-6">
+            <div>
+              <h2 className="text-xl font-semibold text-destructive">Опасная зона</h2>
+              <p className="text-sm text-muted-foreground">
+                Действия здесь необратимы. Будьте осторожны.
+              </p>
+            </div>
+            
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 border border-destructive/30 rounded-lg bg-destructive/5">
+              <div>
+                <p className="font-medium">Выход из системы</p>
+                <p className="text-sm text-muted-foreground">
+                  Завершить текущую сессию на этом устройстве
+                </p>
+              </div>
+              <LogoutButton />
+            </div>
           </div>
         </TabsContent>
       </Tabs>

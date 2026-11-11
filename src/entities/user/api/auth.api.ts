@@ -18,3 +18,14 @@ export const logoutRequest = (token: string): Promise<void> => {
     token,
   })
 }
+
+export const updateProfileRequest = (
+  input: { name: string }, 
+  token: string
+): Promise<User> => {
+  return http<User>('/users/me', {
+    method: 'PATCH',
+    body: JSON.stringify(input),
+    token,
+  })
+}

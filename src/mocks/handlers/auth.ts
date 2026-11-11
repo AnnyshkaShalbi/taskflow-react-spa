@@ -2,6 +2,7 @@ import { http, HttpResponse, delay } from 'msw'
 import type { LoginInput, AuthResponse } from '@/entities/user'
 import { mockUsers } from '../data/users'
 import { mockCredentials } from '../data/auth'
+import { getUsers } from './users'
 
 // Имитация JWT: кодируем userId в base64.
 // Это stateless-подход: серверу не нужно хранить сессии в памяти.
@@ -61,7 +62,10 @@ export const authHandlers = [
       return HttpResponse.json({ message: 'Невалидный токен' }, { status: 401 })
     }
 
-    const user = mockUsers.find((u) => u.id === userId)
+    // ИСПОЛЬЗУЕМ getUsers() вместо mockUsers
+    const users = getUsers()
+    const user = users.find((u) => u.id === userId)
+
     if (!user) {
       return HttpResponse.json({ message: 'Пользователь не найден' }, { status: 401 })
     }

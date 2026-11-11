@@ -6,3 +6,9 @@ export const loginSchema = z.object({
 })
 
 export type LoginFormValues = z.infer<typeof loginSchema>
+
+export const updateProfileSchema = z.object({
+  name: z.string().min(2, 'Минимум 2 символа').max(50, 'Максимум 50 символов'),
+})
+
+export type UpdateProfileFormValues = z.infer<typeof updateProfileSchema>

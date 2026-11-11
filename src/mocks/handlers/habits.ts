@@ -4,7 +4,19 @@ import { mockHabits } from '../data/habits'
 
 const STORAGE_KEY = 'taskflow-mock-habits'
 
-// Читаем привычки из localStorage (или отдаем исходные моки)
+// Получаем ID текущего пользователя из заголовка Authorization
+function getCurrentUserId(request: Request): string {
+  const authHeader = request.headers.get('Authorization')
+  if (!authHeader) return 'user-1'
+  
+  const token = authHeader.replace('Bearer ', '')
+  try {
+    return atob(token)
+  } catch {
+    return 'user-1'
+  }
+}
+
 function getHabits(): Habit[] {
   const stored = localStorage.getItem(STORAGE_KEY)
   if (stored) {
@@ -17,16 +29,20 @@ function getHabits(): Habit[] {
   return [...mockHabits]
 }
 
-// Сохраняем привычки в localStorage
 function saveHabits(habits: Habit[]) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(habits))
 }
 
 export const habitHandlers = [
-  // GET /api/habits — список всех привычек
-  http.get('/api/habits', async () => {
+  // GET /api/habits — список привычек ТОЛЬКО текущего пользователя
+  http.get('/api/habits', async ({ request }) => {
     await delay(300)
-    return HttpResponse.json(getHabits())
+    const currentUserId = getCurrentUserId(request)
+    const habits = getHabits()
+    
+    // Фильтруем: отдаем только привычки этого юзера
+    const userHabits = habits.filter(h => h.userId === currentUserId)
+    return HttpResponse.json(userHabits)
   }),
 
   // GET /api/habits/:id — одна привычка
@@ -48,9 +64,11 @@ export const habitHandlers = [
     await delay(300)
     const input = (await request.json()) as CreateHabitInput
     const habits = getHabits()
+    const currentUserId = getCurrentUserId(request)
 
     const newHabit: Habit = {
       id: crypto.randomUUID(),
+      userId: currentUserId, 
       title: input.title,
       description: input.description,
       frequency: input.frequency,
@@ -99,7 +117,7 @@ export const habitHandlers = [
     return new HttpResponse(null, { status: 204 })
   }),
 
-  // POST /api/habits/:id/toggle — отметить/снять выполнение сегодня
+  // POST /api/habits/:id/toggle — отметить/снять выполнение
   http.post('/api/habits/:id/toggle', async ({ params, request }) => {
     await delay(200)
     const { id } = params

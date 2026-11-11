@@ -21,4 +21,19 @@ export const habitsApi = {
       token,
     })
   },
+
+  update: (id: string, input: Partial<CreateHabitInput>, token: string): Promise<Habit> => {
+    return http<Habit>(`/habits/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(input),
+      token,
+    })
+  },
+
+  delete: (id: string, token: string): Promise<void> => {
+    return http<void>(`/habits/${id}`, {
+      method: 'DELETE',
+      token,
+    })
+  },
 }

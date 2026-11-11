@@ -1,15 +1,14 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useAuthStore } from '@/entities/user'
-import { http } from '@/shared/api/http'
+import { http, ApiError } from '@/shared/api/http' // <-- Импортируем ApiError
 import type { Board } from '../model/types'
 
-// Хук для приглашения
 export function useInviteMember() {
   const token = useAuthStore((s) => s.token)
   const queryClient = useQueryClient()
 
-  return useMutation({
-    mutationFn: ({ boardId, email }: { boardId: string; email: string }) => 
+  return useMutation<Board, ApiError, { boardId: string; email: string }>({
+    mutationFn: ({ boardId, email }) => 
       http<Board>(`/boards/${boardId}/members`, {
         method: 'POST',
         body: JSON.stringify({ email }),
@@ -21,13 +20,12 @@ export function useInviteMember() {
   })
 }
 
-// Хук для удаления участника
 export function useRemoveMember() {
   const token = useAuthStore((s) => s.token)
   const queryClient = useQueryClient()
 
-  return useMutation({
-    mutationFn: ({ boardId, userId }: { boardId: string; userId: string }) => 
+  return useMutation<Board, ApiError, { boardId: string; userId: string }>({
+    mutationFn: ({ boardId, userId }) => 
       http<Board>(`/boards/${boardId}/members/${userId}`, {
         method: 'DELETE',
         token: token!,

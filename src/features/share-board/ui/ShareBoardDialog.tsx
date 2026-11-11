@@ -1,8 +1,9 @@
-import { useState, type FormEvent } from 'react'
+import { useState, type FormEvent } from 'react' // <-- Исправлен импорт
 import { Users, X } from 'lucide-react'
 import { useInviteMember, useRemoveMember } from '@/entities/board'
 import type { Board } from '@/entities/board'
 import { useAuthStore, useUsers } from '@/entities/user'
+import { ApiError } from '@/shared/api/http' // <-- Импортируем класс ошибки
 import { Button } from '@/shared/ui/button'
 import { Input } from '@/shared/ui/input'
 import {
@@ -19,7 +20,6 @@ type ShareBoardDialogProps = {
   board: Board
 }
 
-// Утилита для инициалов
 const getInitials = (name: string) => name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
 
 export function ShareBoardDialog({ board }: ShareBoardDialogProps) {
@@ -27,20 +27,21 @@ export function ShareBoardDialog({ board }: ShareBoardDialogProps) {
   const [error, setError] = useState('')
   
   const currentUser = useAuthStore(s => s.user)
-  const { data: allUsers = [] } = useUsers() // Загружаем всех юзеров
+  const { data: allUsers = [] } = useUsers()
   const { mutate: invite, isPending: isInviting } = useInviteMember()
   const { mutate: remove } = useRemoveMember()
 
   const isOwner = board.ownerId === currentUser?.id
 
-  const handleInvite = (e: React.FormEvent) => {
+  const handleInvite = (e: FormEvent) => { // <-- Убрали React.
     e.preventDefault()
     setError('')
     if (!email) return
 
     invite({ boardId: board.id, email }, {
       onSuccess: () => setEmail(''),
-      onError: (err: any) => {
+      // Исправление: указываем тип ApiError вместо any
+      onError: (err: ApiError) => {
         setError(err.message || 'Ошибка при приглашении')
       }
     })
@@ -77,11 +78,9 @@ export function ShareBoardDialog({ board }: ShareBoardDialogProps) {
           
           {error && <p className="text-sm text-destructive">{error}</p>}
 
-          {/* Список участников */}
           <div className="space-y-2 mt-4">
             <h4 className="text-sm font-medium text-muted-foreground">Участники:</h4>
             
-            {/* Владелец всегда в списке */}
             {(() => {
               const owner = allUsers.find(u => u.id === board.ownerId)
               return (
@@ -101,7 +100,6 @@ export function ShareBoardDialog({ board }: ShareBoardDialogProps) {
               )
             })()}
 
-            {/* Остальные участники */}
             {board.memberIds.map(memberId => {
               const member = allUsers.find(u => u.id === memberId)
               if (!member) return null

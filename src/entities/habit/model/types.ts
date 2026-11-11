@@ -4,6 +4,7 @@ export type HabitFrequency = 'daily' | 'weekly'
 
 export type Habit = Timestamps & {
   id: ID
+  userId: ID 
   title: string
   description?: string
   frequency: HabitFrequency

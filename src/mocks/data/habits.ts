@@ -3,6 +3,7 @@ import type { Habit } from '@/entities/habit'
 export const mockHabits: Habit[] = [
   {
     id: 'habit-1',
+    userId: 'user-1',
     title: 'Пить 8 стаканов воды',
     description: 'Поддерживать водный баланс в течение дня',
     frequency: 'daily',
@@ -21,6 +22,7 @@ export const mockHabits: Habit[] = [
   },
   {
     id: 'habit-2',
+    userId: 'user-1',
     title: 'Утренняя зарядка',
     description: '15 минут растяжки и базовых упражнений',
     frequency: 'daily',
@@ -32,6 +34,7 @@ export const mockHabits: Habit[] = [
   },
   {
     id: 'habit-3',
+    userId: 'user-1',
     title: 'Тренировка в зале',
     description: 'Силовая тренировка по программе',
     frequency: 'weekly',
@@ -43,6 +46,7 @@ export const mockHabits: Habit[] = [
   },
   {
     id: 'habit-4',
+    userId: 'user-1',
     title: 'Читать книгу',
     description: 'Минимум 20 страниц в день',
     frequency: 'daily',
@@ -54,6 +58,7 @@ export const mockHabits: Habit[] = [
   },
   {
     id: 'habit-5',
+    userId: 'user-1',
     title: 'Медитация',
     description: '10 минут осознанности утром',
     frequency: 'weekly',

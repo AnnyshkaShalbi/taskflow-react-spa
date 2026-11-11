@@ -1,4 +1,5 @@
 import { HabitList } from '@/widgets/habit-list'
+import { CreateHabitDialog } from '@/features/create-habit'
 
 export function HabitsPage() {
   return (
@@ -10,7 +11,8 @@ export function HabitsPage() {
             Отмечайте выполнение и следите за своими сериями (стриками).
           </p>
         </div>
-        {/* Сюда мы добавим кнопку создания в следующем шаге */}
+        
+        <CreateHabitDialog />
       </div>
 
       <HabitList />

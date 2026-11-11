@@ -2,13 +2,13 @@ import { TaskList } from '@/widgets/task-list'
 import { CreateTaskDialog } from '@/features/create-task'
 import { DashboardStats } from '@/widgets/dashboard-stats'
 import { TaskActivityChart } from '@/widgets/task-activity-chart'
-import { BoardMembers } from '@/widgets/board-members' // <-- Импорт
+import { BoardMembers } from '@/widgets/board-members'
 
 export function DashboardPage() {
   return (
     <div className="p-8 max-w-7xl mx-auto space-y-8">
       {/* Шапка */}
-      <div className="flex justify-between items-start"> {/* Изменили на items-start */}
+      <div className="flex justify-between items-start">
         <div className="space-y-4">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">Обзор</h1>
@@ -16,7 +16,6 @@ export function DashboardPage() {
               Ваша статистика и последние задачи.
             </p>
           </div>
-          {/* Добавили виджет с участниками */}
           <BoardMembers />
         </div>
         <CreateTaskDialog />

@@ -1,13 +1,13 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { 
-  DndContext, 
-  DragOverlay, 
-  pointerWithin, 
+import {
+  DndContext,
+  DragOverlay,
+  pointerWithin,
   defaultDropAnimationSideEffects,
-  type DragEndEvent, 
+  type DragEndEvent,
   type DragStartEvent,
-  type DropAnimation 
+  type DropAnimation
 } from '@dnd-kit/core'
 import { useTasks, useUpdateTask } from '@/entities/task'
 import type { Task, TaskStatus } from '@/entities/task'
@@ -18,25 +18,29 @@ import { useKanbanSensors } from '../lib/sensors'
 
 const COLUMNS: TaskStatus[] = ['todo', 'in-progress', 'done']
 
-// Настраиваем быструю и упругую анимацию падения
 const dropAnimationConfig: DropAnimation = {
-  duration: 200, // 200мс — золотой стандарт, кажется мгновенным, но плавным
-  easing: 'cubic-bezier(0.18, 0.67, 0.6, 1.22)', // Легкий отскок (пружина)
+  duration: 250,
+  easing: 'cubic-bezier(0.25, 1, 0.5, 1)',
   sideEffects: defaultDropAnimationSideEffects({
-    styles: {
-      active: {
-        opacity: '0.5', // Оригинал на доске будет слегка прозрачным в момент падения
-      },
-    },
+    styles: { active: { opacity: '0' } },
+    className: { dragOverlay: 'kanban-dropping' },
   }),
 }
 
 export function KanbanBoard() {
   const { data: tasks, isLoading } = useTasks()
-  const { mutate: updateTask } = useUpdateTask()
+  const { mutateAsync: updateTask } = useUpdateTask()
   const sensors = useKanbanSensors()
-  
+
   const [activeTask, setActiveTask] = useState<Task | null>(null)
+  const [pendingMoves, setPendingMoves] = useState<Record<string, TaskStatus>>({})
+
+  const boardTasks = useMemo(
+    () => (tasks ?? []).map(task =>
+      task.id in pendingMoves ? { ...task, status: pendingMoves[task.id] } : task,
+    ),
+    [tasks, pendingMoves],
+  )
 
   if (isLoading) {
     return (
@@ -52,30 +56,31 @@ export function KanbanBoard() {
     )
   }
 
+  const settleMove = (taskId: string, status: TaskStatus) => {
+    setPendingMoves(prev => {
+      if (prev[taskId] !== status) return prev
+      const next = { ...prev }
+      delete next[taskId]
+      return next
+    })
+  }
+
   const handleDragStart = (event: DragStartEvent) => {
-    const task = event.active.data.current?.task as Task
-    setActiveTask(task)
+    setActiveTask(event.active.data.current?.task as Task)
   }
 
   const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event
-    
-    // СРАЗУ сбрасываем оверлей, чтобы анимация падения началась моментально
     setActiveTask(null)
 
-    if (!over || active.id === over.id) return
+    const task = event.active.data.current?.task as Task | undefined
+    const newStatus = event.over?.id as TaskStatus | undefined
+    if (!task || !newStatus || task.status === newStatus) return
 
-    const taskId = active.id as string
-    const newStatus = over.id as TaskStatus
-    
-    const task = tasks?.find(t => t.id === taskId)
-    if (!task || task.status === newStatus) return
+    setPendingMoves(prev => ({ ...prev, [task.id]: newStatus }))
 
-    // Оптимистичное обновление перекинет карточку в новую колонку под капотом
-    updateTask({
-      id: taskId,
-      input: { status: newStatus }
-    })
+    updateTask({ id: task.id, input: { status: newStatus } })
+      .catch(() => {}) // ошибка обработана откатом в useUpdateTask
+      .finally(() => settleMove(task.id, newStatus))
   }
 
   return (
@@ -84,11 +89,12 @@ export function KanbanBoard() {
       collisionDetection={pointerWithin}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
+      onDragCancel={() => setActiveTask(null)}
     >
       <div className="flex gap-4 overflow-x-auto pb-4 items-start h-full">
         {COLUMNS.map(status => {
-          const columnTasks = tasks?.filter(t => t.status === status) ?? []
-          
+          const columnTasks = boardTasks.filter(t => t.status === status)
+
           return (
             <KanbanColumn key={status} status={status} count={columnTasks.length}>
               {columnTasks.map(task => (
@@ -100,8 +106,8 @@ export function KanbanBoard() {
       </div>
 
       {createPortal(
-        <DragOverlay 
-          style={{ zIndex: 9999 }} 
+        <DragOverlay
+          style={{ zIndex: 9999 }}
           dropAnimation={dropAnimationConfig}
         >
           {activeTask ? <KanbanCard task={activeTask} isOverlay /> : null}

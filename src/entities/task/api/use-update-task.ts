@@ -16,11 +16,12 @@ export function useUpdateTask() {
       // Отменяем текущие запросы на refetch, чтобы они не перезаписали наш оптимистичный результат
       await queryClient.cancelQueries({ queryKey: ['tasks'] })
 
-      // Сохраняем старое состояние кэша, чтобы откатить в случае ошибки
-      const previousTasks = queryClient.getQueryData<Task[]>(['tasks'])
+      // Списки задач лежат под ключами ['tasks', boardId], поэтому работаем
+      // со всеми запросами по префиксу, а не с точным ключом ['tasks']
+      const previousTasks = queryClient.getQueriesData<Task[]>({ queryKey: ['tasks'] })
 
       // Обновляем кэш руками (мгновенно меняем UI)
-      queryClient.setQueryData<Task[]>(['tasks'], (old) =>
+      queryClient.setQueriesData<Task[]>({ queryKey: ['tasks'] }, (old) =>
         old?.map((task) =>
           task.id === id ? { ...task, ...input } : task,
         ),
@@ -33,9 +34,9 @@ export function useUpdateTask() {
     // 2. Если сервер вернул ошибку (например, 500)
     onError: (_err, _newData, context) => {
       // Откатываем всё назад, используя сохранённые старые данные
-      if (context?.previousTasks) {
-        queryClient.setQueryData(['tasks'], context.previousTasks)
-      }
+      context?.previousTasks.forEach(([queryKey, data]) => {
+        queryClient.setQueryData(queryKey, data)
+      })
     },
 
     // 3. Всегда — после успеха или ошибки

@@ -1,5 +1,4 @@
 import { useDraggable } from '@dnd-kit/core'
-import { CSS } from '@dnd-kit/utilities'
 import { Card } from '@/shared/ui/card'
 import { Badge } from '@/shared/ui/badge'
 import type { Task, TaskPriority } from '@/entities/task'
@@ -11,32 +10,31 @@ const priorityColors: Record<TaskPriority, string> = {
   high: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300',
 }
 
-export function KanbanCard({ task, isOverlay = false }: { task: Task; isOverlay?: boolean }) {
-  const draggable = useDraggable({
+type KanbanCardProps = {
+  task: Task
+  isOverlay?: boolean
+}
+
+export function KanbanCard({ task, isOverlay = false }: KanbanCardProps) {
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: task.id,
     data: { task },
-    disabled: isOverlay, 
+    disabled: isOverlay,
   })
 
-  const { attributes, listeners, setNodeRef, transform, isDragging } = draggable
-
-  const style = !isOverlay && transform ? {
-    transform: CSS.Translate.toString(transform),
-    opacity: isDragging ? 0.3 : 1, 
-  } : undefined
+  const dragProps = isOverlay ? {} : { ref: setNodeRef, ...listeners, ...attributes }
 
   return (
     <Card
-      ref={isOverlay ? undefined : setNodeRef}
-      style={style}
-      {...(!isOverlay ? listeners : {})}
-      {...(!isOverlay ? attributes : {})}
+      {...dragProps}
       className={cn(
-        // Базовые стили + плавное появление (animate-in fade-in zoom-in)
-        'p-3 cursor-grab active:cursor-grabbing hover:shadow-md bg-card touch-none animate-in fade-in zoom-in-95 duration-200',
+        'p-3 cursor-grab bg-card touch-none select-none transition-shadow hover:shadow-md',
         isDragging && 'opacity-30',
-        // Стили для летящего оверлея (наклон и тень)
-        isOverlay && 'shadow-2xl rotate-3 scale-105 cursor-grabbing ring-2 ring-primary/20'
+        isOverlay && [
+          'cursor-grabbing rotate-2 scale-[1.03] shadow-2xl ring-2 ring-primary/20',
+          'transition-[rotate,scale,box-shadow] duration-250 ease-out',
+          'in-[.kanban-dropping]:rotate-0 in-[.kanban-dropping]:scale-100 in-[.kanban-dropping]:shadow-sm',
+        ],
       )}
     >
       <div className="flex justify-between items-start gap-2 mb-2 pointer-events-none">

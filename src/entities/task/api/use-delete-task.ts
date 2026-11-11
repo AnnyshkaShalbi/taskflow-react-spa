@@ -9,27 +9,28 @@ export function useDeleteTask() {
 
   return useMutation({
     mutationFn: (id: string) => tasksApi.delete(id, token!),
-    
+
     // Оптимистичное удаление
     onMutate: async (id) => {
       await queryClient.cancelQueries({ queryKey: ['tasks'] })
-      const previousTasks = queryClient.getQueryData<Task[]>(['tasks'])
-      
+      // Ключи списков — ['tasks', boardId], поэтому работаем по префиксу
+      const previousTasks = queryClient.getQueriesData<Task[]>({ queryKey: ['tasks'] })
+
       // Мгновенно убираем задачу из кэша (и из UI)
-      queryClient.setQueryData<Task[]>(['tasks'], (old) => 
+      queryClient.setQueriesData<Task[]>({ queryKey: ['tasks'] }, (old) =>
         old?.filter((task) => task.id !== id)
       )
-      
+
       return { previousTasks }
     },
-    
+
     // Если сервер вернул ошибку — возвращаем задачу на место
     onError: (_err, _id, context) => {
-      if (context?.previousTasks) {
-        queryClient.setQueryData(['tasks'], context.previousTasks)
-      }
+      context?.previousTasks.forEach(([queryKey, data]) => {
+        queryClient.setQueryData(queryKey, data)
+      })
     },
-    
+
     // В любом случае синхронизируемся с сервером
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] })

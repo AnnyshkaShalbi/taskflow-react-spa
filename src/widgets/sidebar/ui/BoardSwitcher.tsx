@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Check, ChevronsUpDown, Trash2, Plus } from 'lucide-react'
 import { useBoardStore, useBoards, useDeleteBoard } from '@/entities/board'
+import { useAuthStore } from '@/entities/user'
 import { Button } from '@/shared/ui/button'
 import {
   DropdownMenu,
@@ -23,12 +24,14 @@ import {
   AlertDialogTrigger,
 } from '@/shared/ui/alert-dialog'
 import { CreateBoardDialog } from '@/features/create-board'
+import { ShareBoardDialog } from '@/features/share-board'
 
 export function BoardSwitcher() {
-  // 1. Состояние для открытия диалога
   const [isCreateOpen, setIsCreateOpen] = useState(false)
 
   const { data: boards = [] } = useBoards()
+  const currentUser = useAuthStore((s) => s.user)
+  
   const activeBoardId = useBoardStore((s) => s.activeBoardId)
   const setActiveBoardId = useBoardStore((s) => s.setActiveBoardId)
   const { mutate: deleteBoard } = useDeleteBoard()
@@ -64,48 +67,58 @@ export function BoardSwitcher() {
             <DropdownMenuLabel>Мои доски</DropdownMenuLabel>
             <DropdownMenuSeparator />
             
-            {boards.map((board) => (
-              <DropdownMenuItem
-                key={board.id}
-                onClick={() => setActiveBoardId(board.id)}
-                className="cursor-pointer flex justify-between group"
-              >
-                <div className="flex items-center gap-2">
-                  {board.id === activeBoardId && <Check className="h-4 w-4" />}
-                  <span>{board.title}</span>
-                </div>
-                
-                {boards.length > 1 && (
-                  <AlertDialog>
-                    <AlertDialogTrigger render={
-                      <button 
-                        className="opacity-0 group-hover:opacity-100 p-1 hover:text-destructive transition-opacity"
-                        onClick={(e) => e.stopPropagation()}
-                      />
-                    }>
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </AlertDialogTrigger>
-                    <AlertDialogContent onClick={(e) => e.stopPropagation()}>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Удалить доску?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          Все задачи внутри этой доски будут безвозвратно удалены.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel render={<Button variant="outline" />}>Отмена</AlertDialogCancel>
-                        <AlertDialogAction 
-                          render={<Button variant="destructive" />}
-                          onClick={(e) => handleDelete(board.id, e)}
-                        >
-                          Удалить
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                )}
-              </DropdownMenuItem>
-            ))}
+            {boards.map((board) => {
+              const isOwner = board.ownerId === currentUser?.id
+
+              return (
+                <DropdownMenuItem
+                  key={board.id}
+                  onClick={() => setActiveBoardId(board.id)}
+                  className="cursor-pointer flex justify-between group"
+                >
+                  <div className="flex items-center gap-2 truncate">
+                    {board.id === activeBoardId && <Check className="h-4 w-4 shrink-0" />}
+                    <span>{board.title}</span>
+                  </div>
+                  
+                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div onClick={(e) => e.stopPropagation()}>
+                      <ShareBoardDialog board={board} />
+                    </div>
+
+                    {isOwner && boards.length > 1 && (
+                      <AlertDialog>
+                        <AlertDialogTrigger render={
+                          <button 
+                            className="p-1 hover:text-destructive transition-colors text-muted-foreground"
+                            onClick={(e) => e.stopPropagation()}
+                          />
+                        }>
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </AlertDialogTrigger>
+                        <AlertDialogContent onClick={(e) => e.stopPropagation()}>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Удалить доску?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Все задачи внутри этой доски будут безвозвратно удалены.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel render={<Button variant="outline" />}>Отмена</AlertDialogCancel>
+                            <AlertDialogAction 
+                              render={<Button variant="destructive" />}
+                              onClick={(e) => handleDelete(board.id, e)}
+                            >
+                              Удалить
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    )}
+                  </div>
+                </DropdownMenuItem>
+              )
+            })}
           </DropdownMenuGroup>
 
           <DropdownMenuSeparator />

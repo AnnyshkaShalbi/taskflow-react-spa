@@ -5,7 +5,7 @@ export type Board = Timestamps & {
   title: string
   description?: string
   ownerId: ID
-  memberIds: ID[] // участники, с которыми поделились доской
+  memberIds: ID[]
   isPublic: boolean
 }
 

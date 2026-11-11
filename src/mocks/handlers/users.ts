@@ -43,4 +43,10 @@ export const userHandlers = [
 
     return HttpResponse.json(users[index])
   }),
+
+  // GET /api/users — получить всех пользователей (для шаринга)
+  http.get('/api/users', async () => {
+    await delay(200)
+    return HttpResponse.json(getUsers())
+  }),
 ]

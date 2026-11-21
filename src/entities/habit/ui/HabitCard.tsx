@@ -61,19 +61,24 @@ export function HabitCard({ habit }: { habit: Habit }) {
   }
 
   return (
-    <Card className="flex flex-col hover:shadow-md transition-shadow">
-      <CardHeader className="pb-2">
-        <div className="flex justify-between items-start">
-          <div className="space-y-1">
-            <CardTitle className="text-lg leading-tight">{habit.title}</CardTitle>
+    // Отступы как у карточки задачи на dashboard: 16px внутри, 12px между шапкой и содержимым
+    <Card className="flex flex-col gap-3 hover:shadow-md transition-shadow">
+      <CardHeader>
+        <div className="flex items-start gap-2">
+          <div className="flex-1 min-w-0 space-y-1">
+            <CardTitle className="wrap-break-word text-base sm:text-lg leading-snug">{habit.title}</CardTitle>
             {habit.description && (
-              <p className="text-sm text-muted-foreground line-clamp-1">{habit.description}</p>
+              <p className="text-xs sm:text-sm text-muted-foreground line-clamp-1">{habit.description}</p>
             )}
           </div>
-          <div className="flex items-center gap-2">
+          {/* -mr/-mt: иконки-кнопки визуально выравниваем по краю карточки */}
+          <div className="flex shrink-0 items-center gap-1 -mr-2 -mt-1">
             {streak > 0 && (
-              <div className="flex items-center gap-1 text-orange-500 font-bold bg-orange-100 dark:bg-orange-900/30 px-2 py-1 rounded-full text-sm">
-                <Flame className="h-4 w-4" />
+              <div
+                title={`Серия: ${streak} дн. подряд`}
+                className="mr-1 flex items-center gap-1 text-orange-500 font-bold bg-orange-100 dark:bg-orange-900/30 px-2 py-0.5 rounded-full text-xs sm:text-sm"
+              >
+                <Flame className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 {streak}
               </div>
             )}
@@ -83,9 +88,10 @@ export function HabitCard({ habit }: { habit: Habit }) {
         </div>
       </CardHeader>
       
-      <CardContent className="flex-1 flex flex-col justify-end gap-4 mt-2">
+      <CardContent className="flex-1 flex flex-col justify-end gap-3 sm:gap-4">
         {/* Дни текущей недели */}
-        <div className="flex justify-between items-center px-1">
+        {/* px-1 / py-1.5 — место под ring-offset «сегодня» и точку-индикатор (Card обрезает overflow) */}
+        <div className="flex justify-between items-center px-1 py-1.5">
           {weekDays.map((day) => {
             const isTarget = habit.targetDays.includes(day.dayOfWeek)
             const isCompleted = habit.completedDates.includes(day.dateStr)

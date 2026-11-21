@@ -13,6 +13,9 @@ import {
 } from '@/shared/ui/form'
 import { ApiError } from '@/shared/api/http'
 
+// 40px на мобилке — удобно попадать пальцем (базовые h-8 = 32px маловаты), 36px с sm
+const fieldClass = 'h-10 sm:h-9'
+
 type LoginFormProps = {
   onSuccess?: () => void
 }
@@ -42,7 +45,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-4 w-full max-w-sm"
+        className="space-y-4 w-full"
       >
         <FormField
           control={form.control}
@@ -53,6 +56,8 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
               <FormControl>
                 <Input
                   type="email"
+                  inputMode="email"
+                  className={fieldClass}
                   placeholder="anna@taskflow.dev"
                   autoComplete="email"
                   {...field}
@@ -72,6 +77,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
               <FormControl>
                 <Input
                   type="password"
+                  className={fieldClass}
                   placeholder="••••••••"
                   autoComplete="current-password"
                   {...field}
@@ -83,10 +89,10 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
         />
 
         {apiError && (
-          <p className="text-sm text-destructive">{apiError}</p>
+          <p role="alert" className="text-sm text-destructive">{apiError}</p>
         )}
 
-        <Button type="submit" className="w-full" disabled={isPending}>
+        <Button type="submit" className={`w-full ${fieldClass}`} disabled={isPending}>
           {isPending ? 'Вход...' : 'Войти'}
         </Button>
       </form>

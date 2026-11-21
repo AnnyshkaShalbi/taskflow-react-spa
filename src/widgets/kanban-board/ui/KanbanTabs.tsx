@@ -91,7 +91,9 @@ function KanbanTab({ status, count, isActive, isDragging, onSelect }: KanbanTabP
       <span className="truncate">{taskStatusLabels[status]}</span>
       <span
         className={cn(
-          'shrink-0 rounded-full px-1.5 text-[10px] sm:text-xs tabular-nums',
+          // Высота = мин. ширина → круг для 1 цифры, аккуратная «пилюля» для 2+
+          'inline-flex shrink-0 items-center justify-center rounded-full tabular-nums leading-none',
+          'h-4.5 min-w-4.5 px-1 text-[10px] sm:h-5 sm:min-w-5 sm:text-xs',
           isActive ? 'bg-muted' : 'bg-background/60',
         )}
       >

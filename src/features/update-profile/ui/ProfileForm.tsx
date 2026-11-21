@@ -30,7 +30,7 @@ export function ProfileForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 max-w-md">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 sm:space-y-6 max-w-md">
         <FormField
           control={form.control}
           name="name"
@@ -51,12 +51,13 @@ export function ProfileForm() {
             Email
           </label>
           <Input value={user?.email || ''} disabled />
-          <p className="text-[0.8rem] text-muted-foreground">
+          <p className="text-xs text-muted-foreground">
             Email нельзя изменить в демо-версии.
           </p>
         </div>
 
-        <Button type="submit" disabled={isPending}>
+        {/* На мобилке — на всю ширину, как остальные основные кнопки (создать, выйти) */}
+        <Button type="submit" disabled={isPending} className="w-full sm:w-auto">
           {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           Сохранить изменения
         </Button>

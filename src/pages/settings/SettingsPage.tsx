@@ -3,40 +3,51 @@ import { User, Palette, ShieldAlert } from 'lucide-react'
 import { ProfileForm } from '@/features/update-profile'
 import { ThemeToggle } from '@/features/theme-toggle'
 import { LogoutButton } from '@/features/logout'
+import { cn } from 'cn'
+
+// Общие стили секций — чтобы все вкладки выглядели одинаково
+const sectionClass = 'border rounded-xl p-4 sm:p-6 space-y-4 sm:space-y-6'
+const sectionTitleClass = 'text-lg sm:text-xl font-semibold tracking-tight'
+const sectionDescriptionClass = 'text-sm text-muted-foreground mt-1'
+const rowClass = 'flex justify-between gap-3 sm:gap-4 p-3 sm:p-4 border rounded-lg'
+const rowTitleClass = 'text-sm sm:text-base font-medium'
+const rowDescriptionClass = 'text-xs sm:text-sm text-muted-foreground mt-0.5'
 
 export function SettingsPage() {
   return (
-    <div className="p-8 max-w-4xl mx-auto space-y-8">
+    // max-w-4xl (а не 7xl, как на других страницах): формы на всю ширину монитора читаются хуже
+    <div className="p-4 sm:p-6 lg:p-8 max-w-4xl mx-auto space-y-6 lg:space-y-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Настройки</h1>
-        <p className="text-muted-foreground mt-1">
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Настройки</h1>
+        <p className="text-sm sm:text-base text-muted-foreground mt-1">
           Управляйте своим профилем, внешним видом и безопасностью аккаунта.
         </p>
       </div>
 
       {/* Вкладки */}
       <Tabs defaultValue="profile" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 max-w-md mb-8">
-          <TabsTrigger value="profile" className="flex items-center gap-2">
+        {/* mb + встроенный gap-2 у Tabs = 12px / 16px — как шаг сетки на других страницах.
+            Высота 40px — как у табов на канбан-доске и удобно для пальца */}
+        <TabsList className="grid w-full sm:max-w-md grid-cols-3 group-data-horizontal/tabs:h-10 mb-1 sm:mb-2">
+          <TabsTrigger value="profile" className="gap-1.5 text-xs sm:text-sm">
             <User className="h-4 w-4" />
-            <span className="hidden sm:inline">Профиль</span>
+            <span className="truncate">Профиль</span>
           </TabsTrigger>
-          <TabsTrigger value="appearance" className="flex items-center gap-2">
+          <TabsTrigger value="appearance" className="gap-1.5 text-xs sm:text-sm">
             <Palette className="h-4 w-4" />
-            <span className="hidden sm:inline">Внешний вид</span>
+            <span className="truncate">Внешний вид</span>
           </TabsTrigger>
-          <TabsTrigger value="account" className="flex items-center gap-2">
+          <TabsTrigger value="account" className="gap-1.5 text-xs sm:text-sm">
             <ShieldAlert className="h-4 w-4" />
-            <span className="hidden sm:inline">Аккаунт</span>
+            <span className="truncate">Аккаунт</span>
           </TabsTrigger>
         </TabsList>
 
-        {/* Контент вкладок (пока с заглушками) */}
         <TabsContent value="profile">
-          <div className="border rounded-xl p-6 space-y-6">
+          <div className={sectionClass}>
             <div>
-              <h2 className="text-xl font-semibold">Профиль</h2>
-              <p className="text-sm text-muted-foreground">
+              <h2 className={sectionTitleClass}>Профиль</h2>
+              <p className={sectionDescriptionClass}>
                 Обновите ваше имя. Оно будет отображаться в шапке приложения.
               </p>
             </div>
@@ -45,18 +56,19 @@ export function SettingsPage() {
         </TabsContent>
 
         <TabsContent value="appearance">
-          <div className="border rounded-xl p-6 space-y-6">
+          <div className={sectionClass}>
             <div>
-              <h2 className="text-xl font-semibold">Внешний вид</h2>
-              <p className="text-sm text-muted-foreground">
+              <h2 className={sectionTitleClass}>Внешний вид</h2>
+              <p className={sectionDescriptionClass}>
                 Настройте тему интерфейса под себя.
               </p>
             </div>
-            
-            <div className="flex items-center justify-between p-4 border rounded-lg">
-              <div>
-                <p className="font-medium">Тема оформления</p>
-                <p className="text-sm text-muted-foreground">Переключить светлую и тёмную тему</p>
+
+            {/* Переключатель темы компактный — даже на мобилке он в одной строке с текстом */}
+            <div className={cn(rowClass, 'items-center')}>
+              <div className="min-w-0">
+                <p className={rowTitleClass}>Тема оформления</p>
+                <p className={rowDescriptionClass}>Переключить светлую и тёмную тему</p>
               </div>
               <ThemeToggle />
             </div>
@@ -64,18 +76,19 @@ export function SettingsPage() {
         </TabsContent>
 
         <TabsContent value="account">
-          <div className="border border-destructive/20 rounded-xl p-6 space-y-6">
+          <div className={cn(sectionClass, 'border-destructive/20')}>
             <div>
-              <h2 className="text-xl font-semibold text-destructive">Опасная зона</h2>
-              <p className="text-sm text-muted-foreground">
+              <h2 className={cn(sectionTitleClass, 'text-destructive')}>Опасная зона</h2>
+              <p className={sectionDescriptionClass}>
                 Действия здесь необратимы. Будьте осторожны.
               </p>
             </div>
-            
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 border border-destructive/30 rounded-lg bg-destructive/5">
+
+            {/* Кнопка выхода крупная — на мобилке переносим её под текст, на всю ширину */}
+            <div className={cn(rowClass, 'flex-col sm:flex-row sm:items-center border-destructive/30 bg-destructive/5')}>
               <div>
-                <p className="font-medium">Выход из системы</p>
-                <p className="text-sm text-muted-foreground">
+                <p className={rowTitleClass}>Выход из системы</p>
+                <p className={rowDescriptionClass}>
                   Завершить текущую сессию на этом устройстве
                 </p>
               </div>

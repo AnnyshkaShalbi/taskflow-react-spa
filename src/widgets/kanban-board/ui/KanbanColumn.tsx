@@ -36,7 +36,8 @@ export function KanbanColumn({ status, count, children, columnRef }: KanbanColum
           <div className={cn('w-2 h-2 rounded-full', columnColors[status])} />
           <h3 className="font-semibold text-sm">{taskStatusLabels[status]}</h3>
         </div>
-        <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
+        {/* Высота = мин. ширина → круг для 1 цифры, «пилюля» для 2+ */}
+        <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-muted px-1 text-xs leading-none tabular-nums text-muted-foreground">
           {count}
         </span>
       </div>

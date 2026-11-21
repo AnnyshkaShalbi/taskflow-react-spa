@@ -36,7 +36,11 @@ const WEEK_DAYS = [
   { label: 'Вс', value: 0 },
 ]
 
-export function CreateHabitDialog() {
+type CreateHabitDialogProps = {
+  triggerClassName?: string
+}
+
+export function CreateHabitDialog({ triggerClassName }: CreateHabitDialogProps) {
   const [open, setOpen] = useState(false)
   const { mutate, isPending } = useCreateHabit()
 
@@ -72,7 +76,7 @@ export function CreateHabitDialog() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger render={<Button />}>
+      <DialogTrigger render={<Button className={triggerClassName} />}>
         <Plus className="mr-2 h-4 w-4" />
         Создать привычку
       </DialogTrigger>

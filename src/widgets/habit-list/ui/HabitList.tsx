@@ -2,14 +2,18 @@ import { useHabits, HabitCard } from '@/entities/habit'
 import { Skeleton } from '@/shared/ui/skeleton'
 import { ClipboardCheck } from 'lucide-react'
 
+// Колонки подобраны по реальной ширине контента: с md появляется сайдбар (224px),
+// и 2 колонки на 768–1023px / 3 колонки на 1024–1279px дают слишком узкие карточки
+const gridClass = 'grid gap-3 sm:gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3'
+
 export function HabitList() {
   const { data: habits, isLoading, isError } = useHabits()
 
   if (isLoading) {
     return (
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className={gridClass}>
         {Array.from({ length: 3 }).map((_, i) => (
-          <div key={i} className="border rounded-xl p-4 space-y-4">
+          <div key={i} className="border rounded-xl p-4 space-y-3 sm:space-y-4">
             <Skeleton className="h-6 w-1/2" />
             <Skeleton className="h-4 w-3/4" />
             <div className="flex gap-2 justify-between">
@@ -39,7 +43,7 @@ export function HabitList() {
   }
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div className={gridClass}>
       {habits.map((habit) => (
         <HabitCard key={habit.id} habit={habit} />
       ))}

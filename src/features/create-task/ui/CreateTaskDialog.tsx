@@ -5,6 +5,8 @@ import { Plus } from 'lucide-react'
 import {
   createTaskSchema,
   useCreateTask,
+  TASK_STATUSES,
+  taskStatusLabels,
   type CreateTaskInputValues,
   type CreateTaskFormValues,
 } from '@/entities/task'
@@ -35,7 +37,11 @@ import {
 } from '@/shared/ui/form'
 import { useBoardStore } from '@/entities/board'
 
-export function CreateTaskDialog() {
+type CreateTaskDialogProps = {
+  triggerClassName?: string
+}
+
+export function CreateTaskDialog({ triggerClassName }: CreateTaskDialogProps) {
   const [open, setOpen] = useState(false)
   const { mutate, isPending } = useCreateTask()
   const activeBoardId = useBoardStore((s) => s.activeBoardId)
@@ -66,7 +72,7 @@ export function CreateTaskDialog() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger render={<Button />}>
+      <DialogTrigger render={<Button className={triggerClassName} />}>
         <Plus className="mr-2 h-4 w-4" />
         Создать задачу
       </DialogTrigger>
@@ -127,9 +133,11 @@ export function CreateTaskDialog() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="todo">К выполнению</SelectItem>
-                        <SelectItem value="in-progress">В работе</SelectItem>
-                        <SelectItem value="done">Готово</SelectItem>
+                        {TASK_STATUSES.map((status) => (
+                          <SelectItem key={status} value={status}>
+                            {taskStatusLabels[status]}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                     <FormMessage />

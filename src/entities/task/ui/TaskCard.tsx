@@ -20,10 +20,10 @@ const priorityConfig: Record<TaskPriority, { label: string; className: string }>
 
 export function TaskCard({ task, className, actions }: TaskCardProps) {
   return (
-    <Card className={cn('flex flex-col hover:shadow-md transition-shadow', className)}>
-      <CardHeader className="pb-3">
-        <div className="flex justify-between items-start gap-2">
-          <CardTitle className="text-base font-semibold leading-tight">
+    <Card className={cn('flex flex-col gap-3 hover:shadow-md transition-shadow', className)}>
+      <CardHeader>
+        <div className="flex items-start gap-2">
+          <CardTitle className="flex-1 min-w-0 wrap-break-word text-sm sm:text-base font-semibold leading-snug">
             {task.title}
           </CardTitle>
           <Badge variant="outline" className={cn('shrink-0', priorityConfig[task.priority].className)}>
@@ -40,7 +40,7 @@ export function TaskCard({ task, className, actions }: TaskCardProps) {
           </p>
         )}
         
-        <div className="flex items-center justify-between mt-2">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <StatusSelect task={task} />
           
           {task.tags.length > 0 && (

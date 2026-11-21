@@ -8,7 +8,8 @@ export function AppLayout() {
       <Header />
       <div className="flex-1 flex">
         <Sidebar />
-        <main className="flex-1">
+        {/* min-w-0: не даём широкому контенту (лента канбана) растягивать main за пределы экрана */}
+        <main className="flex-1 min-w-0">
           <Outlet />
         </main>
       </div>

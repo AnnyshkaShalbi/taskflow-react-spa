@@ -7,15 +7,10 @@ import {
 } from '@/shared/ui/select'
 import { useUpdateTask } from '../api/use-update-task'
 import type { Task, TaskStatus } from '../model/types'
+import { TASK_STATUSES, taskStatusLabels } from '../model/status'
 
 type StatusSelectProps = {
   task: Task
-}
-
-const statusLabels: Record<TaskStatus, string> = {
-  'todo': 'К выполнению',
-  'in-progress': 'В работе',
-  'done': 'Готово',
 }
 
 export function StatusSelect({ task }: StatusSelectProps) {
@@ -39,9 +34,9 @@ export function StatusSelect({ task }: StatusSelectProps) {
         <SelectValue />
       </SelectTrigger>
       <SelectContent>
-        {(Object.keys(statusLabels) as TaskStatus[]).map((status) => (
+        {TASK_STATUSES.map((status) => (
           <SelectItem key={status} value={status}>
-            {statusLabels[status]}
+            {taskStatusLabels[status]}
           </SelectItem>
         ))}
       </SelectContent>

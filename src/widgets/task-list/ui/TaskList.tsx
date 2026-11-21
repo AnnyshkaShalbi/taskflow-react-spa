@@ -8,7 +8,7 @@ export function TaskList() {
 
   if (isLoading) {
     return (
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {Array.from({ length: 6 }).map((_, i) => (
           <div key={i} className="border rounded-xl p-4 space-y-3">
             <div className="flex justify-between">
@@ -50,7 +50,7 @@ export function TaskList() {
   }
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 xl:grid-cols-3">
       {tasks.map((task) => (
         <TaskCard key={task.id} task={task} actions={<DeleteTaskButton taskId={task.id} />} />
       ))}

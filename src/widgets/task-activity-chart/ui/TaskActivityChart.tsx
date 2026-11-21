@@ -42,14 +42,14 @@ export function TaskActivityChart() {
   }
 
   return (
-    <Card className="w-full">
+    <Card className="w-full sm:[--card-spacing:--spacing(6)]">
       <CardHeader>
         <CardTitle>Активность за неделю</CardTitle>
-        <CardDescription>
+        <CardDescription className="text-xs sm:text-sm">
           Количество созданных и выполненных задач за последние 7 дней
         </CardDescription>
       </CardHeader>
-      <CardContent className="h-80 mt-4 flex flex-col">
+      <CardContent className="h-64 sm:h-72 lg:h-80 flex flex-col">
         <div className="flex-1 min-h-0">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
@@ -124,7 +124,7 @@ export function TaskActivityChart() {
         </div>
 
         {/* Кастомная интерактивная легенда */}
-        <div className="flex justify-center gap-6 mt-4 text-sm font-medium">
+        <div className="flex justify-center gap-4 sm:gap-6 mt-3 sm:mt-4 text-xs sm:text-sm font-medium">
           <button 
             type="button"
             onClick={() => toggleSeries('created')}

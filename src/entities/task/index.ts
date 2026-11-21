@@ -17,6 +17,8 @@ export type {
   CreateTaskInputValues 
 } from './model/shema'
 
+export { TASK_STATUSES, taskStatusLabels } from './model/status'
+
 export { useTasks } from './api/use-tasks'
 export { useCreateTask } from './api/use-create-task'
 export { useUpdateTask } from './api/use-update-task'

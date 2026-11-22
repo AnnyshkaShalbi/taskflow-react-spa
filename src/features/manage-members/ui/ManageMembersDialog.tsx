@@ -7,6 +7,7 @@ import { Button } from '@/shared/ui/button'
 import { Checkbox } from '@/shared/ui/checkbox'
 import { Input } from '@/shared/ui/input'
 import { Avatar, AvatarFallback } from '@/shared/ui/avatar'
+import { getInitials } from '@/shared/lib/get-initials'
 import {
   Dialog,
   DialogContent,
@@ -15,9 +16,6 @@ import {
   DialogDescription,
   DialogTrigger,
 } from '@/shared/ui/dialog'
-
-const getInitials = (name: string) => 
-  name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
 
 export function ManageMembersDialog({ board }: { board: Board }) {
   const [search, setSearch] = useState('')

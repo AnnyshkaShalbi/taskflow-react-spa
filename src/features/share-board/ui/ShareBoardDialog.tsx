@@ -15,12 +15,12 @@ import {
   DialogTrigger,
 } from '@/shared/ui/dialog'
 import { Avatar, AvatarFallback } from '@/shared/ui/avatar'
+import { getInitials } from '@/shared/lib/get-initials'
 
 type ShareBoardDialogProps = {
   board: Board
 }
 
-const getInitials = (name: string) => name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
 
 export function ShareBoardDialog({ board }: ShareBoardDialogProps) {
   const [email, setEmail] = useState('')

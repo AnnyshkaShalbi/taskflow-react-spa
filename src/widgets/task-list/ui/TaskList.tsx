@@ -1,14 +1,18 @@
 import { useTasks, TaskCard } from '@/entities/task'
 import { Skeleton } from '@/shared/ui/skeleton'
 import { ClipboardList } from 'lucide-react'
-import { DeleteTaskButton } from '@/features/delete-task' 
+import { DeleteTaskButton } from '@/features/delete-task'
+
+// Как в списке привычек: колонки по реальной ширине контента — с md появляется сайдбар (224px),
+// и 2 колонки на 768–1023px / 3 колонки на 1024–1279px дают слишком узкие карточки
+const gridClass = 'grid gap-3 sm:gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3'
 
 export function TaskList() {
   const { data: tasks, isLoading, isError } = useTasks()
 
   if (isLoading) {
     return (
-      <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      <div className={gridClass}>
         {Array.from({ length: 6 }).map((_, i) => (
           <div key={i} className="border rounded-xl p-4 space-y-3">
             <div className="flex justify-between">
@@ -50,7 +54,7 @@ export function TaskList() {
   }
 
   return (
-    <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 xl:grid-cols-3">
+    <div className={gridClass}>
       {tasks.map((task) => (
         <TaskCard key={task.id} task={task} actions={<DeleteTaskButton taskId={task.id} />} />
       ))}

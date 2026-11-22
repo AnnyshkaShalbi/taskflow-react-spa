@@ -1,9 +1,10 @@
 import { useNavigate } from 'react-router'
 import { ListTodo } from 'lucide-react'
-import { LoginForm } from '@/features/auth-by-email'
+import { DemoLogin, LoginForm } from '@/features/auth-by-email'
 
 export function LoginPage() {
   const navigate = useNavigate()
+  const goToApp = () => navigate('/', { replace: true })
 
   return (
     // min-h-dvh вместо min-h-screen: на мобилке 100vh не учитывает панели браузера,
@@ -25,7 +26,9 @@ export function LoginPage() {
           </div>
         </div>
 
-        <LoginForm onSuccess={() => navigate('/', { replace: true })} />
+        <LoginForm onSuccess={goToApp} />
+        {/* Рендерится только в демо-режиме (см. shared/config/demo) */}
+        <DemoLogin onSuccess={goToApp} />
       </div>
     </div>
   )

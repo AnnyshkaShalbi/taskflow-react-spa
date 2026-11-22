@@ -3,19 +3,11 @@ import { ListTodo } from 'lucide-react'
 import { useAuthStore } from '@/entities/user'
 import { ThemeToggle } from '@/features/theme-toggle'
 import { Avatar, AvatarFallback } from '@/shared/ui/avatar'
+import { getInitials } from '@/shared/lib/get-initials'
 import { MobileSidebar } from '@/widgets/sidebar'
 
 export function Header() {
   const user = useAuthStore((s) => s.user)
-
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map((n) => n[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2)
-  }
 
   return (
     <header className="sticky top-0 z-30 border-b bg-background md:static">

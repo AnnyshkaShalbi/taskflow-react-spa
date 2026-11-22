@@ -2,10 +2,8 @@ import { Users } from 'lucide-react'
 import { useBoardStore, useBoards } from '@/entities/board'
 import { useAuthStore, useUsers } from '@/entities/user'
 import { Avatar, AvatarFallback } from '@/shared/ui/avatar'
+import { getInitials } from '@/shared/lib/get-initials'
 import { ManageMembersDialog } from '@/features/manage-members' // <-- Импорт
-
-const getInitials = (name: string) => 
-  name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
 
 export function BoardMembers() {
   const activeBoardId = useBoardStore((s) => s.activeBoardId)

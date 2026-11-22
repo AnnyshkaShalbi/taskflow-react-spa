@@ -1,6 +1,7 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { loginSchema, type LoginFormValues, useLogin } from '@/entities/user'
+import { useIsMutating } from '@tanstack/react-query'
+import { loginSchema, type LoginFormValues, useLogin, LOGIN_MUTATION_KEY } from '@/entities/user'
 import { Button } from '@/shared/ui/button'
 import { Input } from '@/shared/ui/input'
 import {
@@ -30,6 +31,8 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
   })
 
   const { mutate, isPending, error } = useLogin()
+  // Пока идёт демо-вход, кнопку формы тоже блокируем — чтобы не было двух параллельных входов
+  const isAnyLoginPending = useIsMutating({ mutationKey: LOGIN_MUTATION_KEY }) > 0
 
   const onSubmit = (values: LoginFormValues) => {
     mutate(values, {
@@ -92,7 +95,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
           <p role="alert" className="text-sm text-destructive">{apiError}</p>
         )}
 
-        <Button type="submit" className={`w-full ${fieldClass}`} disabled={isPending}>
+        <Button type="submit" className={`w-full ${fieldClass}`} disabled={isAnyLoginPending}>
           {isPending ? 'Вход...' : 'Войти'}
         </Button>
       </form>

@@ -1,148 +1,104 @@
 import { http, HttpResponse, delay } from 'msw'
 import type { Habit, CreateHabitInput, UpdateHabitInput } from '@/entities/habit'
-import { mockHabits } from '../data/habits'
+import { db } from '../db'
+import { getUserIdFromRequest, notFound, unauthorized } from '../lib/auth'
 
-const STORAGE_KEY = 'taskflow-mock-habits'
+/** Привычка текущего пользователя. Чужая — как несуществующая (404), чтобы не раскрывать id */
+const findOwnHabit = (id: string, userId: string) =>
+  db.habits.getAll().find((h) => h.id === id && h.userId === userId)
 
-// Получаем ID текущего пользователя из заголовка Authorization
-function getCurrentUserId(request: Request): string {
-  const authHeader = request.headers.get('Authorization')
-  if (!authHeader) return 'user-1'
-  
-  const token = authHeader.replace('Bearer ', '')
-  try {
-    return atob(token)
-  } catch {
-    return 'user-1'
-  }
-}
-
-function getHabits(): Habit[] {
-  const stored = localStorage.getItem(STORAGE_KEY)
-  if (stored) {
-    try {
-      return JSON.parse(stored) as Habit[]
-    } catch {
-      return [...mockHabits]
-    }
-  }
-  return [...mockHabits]
-}
-
-function saveHabits(habits: Habit[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(habits))
+function saveHabit(updated: Habit): Habit {
+  const next = { ...updated, updatedAt: new Date().toISOString() }
+  db.habits.saveAll(db.habits.getAll().map((h) => (h.id === next.id ? next : h)))
+  return next
 }
 
 export const habitHandlers = [
-  // GET /api/habits — список привычек ТОЛЬКО текущего пользователя
+  // GET /api/habits — привычки ТОЛЬКО текущего пользователя
   http.get('/api/habits', async ({ request }) => {
     await delay(300)
-    const currentUserId = getCurrentUserId(request)
-    const habits = getHabits()
-    
-    // Фильтруем: отдаем только привычки этого юзера
-    const userHabits = habits.filter(h => h.userId === currentUserId)
-    return HttpResponse.json(userHabits)
+    const userId = getUserIdFromRequest(request)
+    if (!userId) return unauthorized()
+
+    return HttpResponse.json(db.habits.getAll().filter((h) => h.userId === userId))
   }),
 
   // GET /api/habits/:id — одна привычка
-  http.get('/api/habits/:id', async ({ params }) => {
+  http.get('/api/habits/:id', async ({ params, request }) => {
     await delay(200)
-    const { id } = params
-    const habits = getHabits()
-    const habit = habits.find((h) => h.id === id)
+    const userId = getUserIdFromRequest(request)
+    if (!userId) return unauthorized()
 
-    if (!habit) {
-      return HttpResponse.json({ message: 'Привычка не найдена' }, { status: 404 })
-    }
-
-    return HttpResponse.json(habit)
+    const habit = findOwnHabit(String(params.id), userId)
+    return habit ? HttpResponse.json(habit) : notFound('Привычка не найдена')
   }),
 
-  // POST /api/habits — создание
+  // POST /api/habits — создание; владелец — текущий пользователь
   http.post('/api/habits', async ({ request }) => {
     await delay(300)
-    const input = (await request.json()) as CreateHabitInput
-    const habits = getHabits()
-    const currentUserId = getCurrentUserId(request)
+    const userId = getUserIdFromRequest(request)
+    if (!userId) return unauthorized()
 
-    const newHabit: Habit = {
+    const input = (await request.json()) as CreateHabitInput
+    const now = new Date().toISOString()
+    const habit: Habit = {
       id: crypto.randomUUID(),
-      userId: currentUserId, 
+      userId,
       title: input.title,
       description: input.description,
       frequency: input.frequency,
       targetDays: input.targetDays,
       color: input.color,
       completedDates: [],
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      createdAt: now,
+      updatedAt: now,
     }
 
-    habits.push(newHabit)
-    saveHabits(habits)
-    return HttpResponse.json(newHabit, { status: 201 })
+    db.habits.saveAll([...db.habits.getAll(), habit])
+    return HttpResponse.json(habit, { status: 201 })
   }),
 
-  // PATCH /api/habits/:id — обновление
+  // PATCH /api/habits/:id — обновление своей привычки
   http.patch('/api/habits/:id', async ({ params, request }) => {
     await delay(300)
-    const { id } = params
+    const userId = getUserIdFromRequest(request)
+    if (!userId) return unauthorized()
+
+    const habit = findOwnHabit(String(params.id), userId)
+    if (!habit) return notFound('Привычка не найдена')
+
     const patch = (await request.json()) as UpdateHabitInput
-    const habits = getHabits()
-    const index = habits.findIndex((h) => h.id === id)
-
-    if (index === -1) {
-      return HttpResponse.json({ message: 'Привычка не найдена' }, { status: 404 })
-    }
-
-    habits[index] = {
-      ...habits[index],
-      ...patch,
-      updatedAt: new Date().toISOString(),
-    }
-
-    saveHabits(habits)
-    return HttpResponse.json(habits[index])
+    // userId перезаписываем исходным: «передать» привычку другому пользователю нельзя
+    return HttpResponse.json(saveHabit({ ...habit, ...patch, userId: habit.userId }))
   }),
 
-  // DELETE /api/habits/:id — удаление
-  http.delete('/api/habits/:id', async ({ params }) => {
+  // DELETE /api/habits/:id — удаление своей привычки
+  http.delete('/api/habits/:id', async ({ params, request }) => {
     await delay(300)
-    const { id } = params
-    const habits = getHabits()
-    const updatedHabits = habits.filter((h) => h.id !== id)
-    
-    saveHabits(updatedHabits)
+    const userId = getUserIdFromRequest(request)
+    if (!userId) return unauthorized()
+
+    const habit = findOwnHabit(String(params.id), userId)
+    if (!habit) return notFound('Привычка не найдена')
+
+    db.habits.saveAll(db.habits.getAll().filter((h) => h.id !== habit.id))
     return new HttpResponse(null, { status: 204 })
   }),
 
-  // POST /api/habits/:id/toggle — отметить/снять выполнение
+  // POST /api/habits/:id/toggle — отметить/снять выполнение за дату
   http.post('/api/habits/:id/toggle', async ({ params, request }) => {
     await delay(200)
-    const { id } = params
+    const userId = getUserIdFromRequest(request)
+    if (!userId) return unauthorized()
+
+    const habit = findOwnHabit(String(params.id), userId)
+    if (!habit) return notFound('Привычка не найдена')
+
     const { date } = (await request.json()) as { date: string }
-    const habits = getHabits()
-    const index = habits.findIndex((h) => h.id === id)
-
-    if (index === -1) {
-      return HttpResponse.json({ message: 'Привычка не найдена' }, { status: 404 })
-    }
-
-    const habit = habits[index]
-    const isCompleted = habit.completedDates.includes(date)
-
-    const updatedDates = isCompleted
+    const completedDates = habit.completedDates.includes(date)
       ? habit.completedDates.filter((d) => d !== date)
       : [...habit.completedDates, date]
 
-    habits[index] = {
-      ...habit,
-      completedDates: updatedDates,
-      updatedAt: new Date().toISOString(),
-    }
-
-    saveHabits(habits)
-    return HttpResponse.json(habits[index])
+    return HttpResponse.json(saveHabit({ ...habit, completedDates }))
   }),
 ]

@@ -9,9 +9,12 @@ import { MobileSidebar } from '@/widgets/sidebar'
 export function Header() {
   const user = useAuthStore((s) => s.user)
 
+  // Шапка закреплена на всех размерах: под ней прилипают сайдбар (десктоп) и табы канбана.
+  // h-14 стоит на самом <header> (border-box): ровно 56px вместе с border-b — на эту высоту
+  // завязаны top-14 у сайдбара и табов. Если задать h-14 внутреннему блоку, шапка станет 57px
   return (
-    <header className="sticky top-0 z-30 border-b bg-background md:static">
-      <div className="flex h-14 items-center justify-between px-4 md:px-6">
+    <header className="sticky top-0 z-30 h-14 border-b bg-background">
+      <div className="flex h-full items-center justify-between px-4 md:px-6">
         <div className="flex items-center gap-1">
           <MobileSidebar />
           <Link to="/" className="flex items-center gap-2 font-semibold">

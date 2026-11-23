@@ -14,14 +14,14 @@ type KanbanTabsProps = {
 
 /**
  * Навигация по колонкам для мобилки/планшета (< xl), где колонки идут лентой.
- * Прилипает под шапкой: на мобилке шапка sticky (h-14), с md — нет.
+ * Прилипает под закреплённой шапкой (h-14).
  * Во время drag на таб можно бросить карточку — не нужно тянуть её до дальней колонки.
  */
 export function KanbanTabs({ active, counts, onSelect, isDragging }: KanbanTabsProps) {
   return (
     <div
       className={cn(
-        'xl:hidden sticky top-14 md:top-0 z-20 bg-background/80 backdrop-blur-md',
+        'xl:hidden sticky top-14 z-20 bg-background/80 backdrop-blur-md',
         // -mt-2 компенсирует py-2: сам переключатель стоит ровно на шаге секций от заголовка (24 / 32px),
         // а до ленты колонок — шаг сетки (12 / 16px)
         '-mx-4 px-4 sm:-mx-6 sm:px-6 py-2 -mt-2 mb-1 sm:mb-2',

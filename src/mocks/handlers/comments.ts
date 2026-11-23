@@ -1,47 +1,29 @@
 import { http, HttpResponse, delay } from 'msw'
 import type { Comment, CreateCommentInput } from '@/entities/comment'
-import { mockComments } from '../data/comments'
+import { db } from '../db'
+import { badRequest, forbidden, getUserIdFromRequest, notFound, unauthorized } from '../lib/auth'
+import { findBoard, isBoardMember } from '../lib/access'
 
-const STORAGE_KEY = 'taskflow-mock-comments'
-
-function getComments(): Comment[] {
-  const stored = localStorage.getItem(STORAGE_KEY)
-  if (stored) {
-    try {
-      return JSON.parse(stored) as Comment[]
-    } catch {
-      return [...mockComments]
-    }
-  }
-  return [...mockComments]
-}
-
-function saveComments(comments: Comment[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(comments))
-}
-
-/** Удалить все комментарии задачи — вызывается при удалении задачи */
-export function deleteCommentsByTask(taskId: string) {
-  saveComments(getComments().filter((c) => c.taskId !== taskId))
-}
-
-// Токен — base64(userId), как в auth-хендлерах
-function getUserIdFromRequest(request: Request): string | null {
-  const token = request.headers.get('Authorization')?.replace('Bearer ', '')
-  if (!token) return null
-  try {
-    return atob(token) || null
-  } catch {
-    return null
-  }
+/** Комментировать и читать комментарии могут участники доски, к которой относится задача */
+function canAccessTask(taskId: string, userId: string) {
+  const task = db.tasks.getAll().find((t) => t.id === taskId)
+  const board = task && findBoard(task.boardId)
+  return !!board && isBoardMember(board, userId)
 }
 
 export const commentHandlers = [
   // GET /api/tasks/:taskId/comments — комментарии задачи, старые сверху
-  http.get('/api/tasks/:taskId/comments', async ({ params }) => {
+  http.get('/api/tasks/:taskId/comments', async ({ params, request }) => {
     await delay(250)
-    const comments = getComments()
-      .filter((c) => c.taskId === params.taskId)
+    const userId = getUserIdFromRequest(request)
+    if (!userId) return unauthorized()
+
+    const taskId = String(params.taskId)
+    if (!canAccessTask(taskId, userId)) return notFound('Задача не найдена')
+
+    const comments = db.comments
+      .getAll()
+      .filter((c) => c.taskId === taskId)
       .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
     return HttpResponse.json(comments)
   }),
@@ -49,25 +31,24 @@ export const commentHandlers = [
   // POST /api/tasks/:taskId/comments — автор берётся из токена, а не из тела запроса
   http.post('/api/tasks/:taskId/comments', async ({ params, request }) => {
     await delay(400)
-    const authorId = getUserIdFromRequest(request)
-    if (!authorId) {
-      return HttpResponse.json({ message: 'Не авторизован' }, { status: 401 })
-    }
+    const userId = getUserIdFromRequest(request)
+    if (!userId) return unauthorized()
+
+    const taskId = String(params.taskId)
+    if (!canAccessTask(taskId, userId)) return notFound('Задача не найдена')
 
     const { text } = (await request.json()) as CreateCommentInput
     const trimmed = text?.trim() ?? ''
-    if (!trimmed) {
-      return HttpResponse.json({ message: 'Комментарий не может быть пустым' }, { status: 400 })
-    }
+    if (!trimmed) return badRequest('Комментарий не может быть пустым')
 
     const comment: Comment = {
       id: crypto.randomUUID(),
-      taskId: String(params.taskId),
-      authorId,
+      taskId,
+      authorId: userId,
       text: trimmed,
       createdAt: new Date().toISOString(),
     }
-    saveComments([...getComments(), comment])
+    db.comments.saveAll([...db.comments.getAll(), comment])
     return HttpResponse.json(comment, { status: 201 })
   }),
 
@@ -75,17 +56,13 @@ export const commentHandlers = [
   http.delete('/api/comments/:id', async ({ params, request }) => {
     await delay(250)
     const userId = getUserIdFromRequest(request)
-    const comments = getComments()
-    const comment = comments.find((c) => c.id === params.id)
+    if (!userId) return unauthorized()
 
-    if (!comment) {
-      return HttpResponse.json({ message: 'Комментарий не найден' }, { status: 404 })
-    }
-    if (comment.authorId !== userId) {
-      return HttpResponse.json({ message: 'Можно удалить только свой комментарий' }, { status: 403 })
-    }
+    const comment = db.comments.getAll().find((c) => c.id === params.id)
+    if (!comment) return notFound('Комментарий не найден')
+    if (comment.authorId !== userId) return forbidden('Можно удалить только свой комментарий')
 
-    saveComments(comments.filter((c) => c.id !== params.id))
+    db.comments.saveAll(db.comments.getAll().filter((c) => c.id !== comment.id))
     return new HttpResponse(null, { status: 204 })
   }),
 ]

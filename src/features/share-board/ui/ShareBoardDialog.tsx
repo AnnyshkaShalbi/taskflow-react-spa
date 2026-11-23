@@ -59,24 +59,34 @@ export function ShareBoardDialog({ board }: ShareBoardDialogProps) {
         <DialogHeader>
           <DialogTitle>Доступ к доске «{board.title}»</DialogTitle>
           <DialogDescription>
-            Пригласите коллег по email. Они получат доступ к задачам на этой доске.
+            {isOwner
+              ? 'Пригласите коллег по email. Они получат доступ к задачам на этой доске.'
+              : 'Участники этой доски — все они работают с её задачами.'}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 pt-4">
-        <form onSubmit={handleInvite} className="flex gap-2">
-            <Input 
-            placeholder="colleague@example.com" 
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            />
-            <Button type="submit" disabled={isInviting}>
-            {isInviting ? '...' : 'Пригласить'}
-            </Button>
-        </form>
-          
-          {error && <p className="text-sm text-destructive">{error}</p>}
+          {/* Приглашать может только владелец (API тоже проверяет это и отвечает 403) */}
+          {isOwner ? (
+            <>
+              <form onSubmit={handleInvite} className="flex gap-2">
+                <Input
+                  placeholder="colleague@example.com"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+                <Button type="submit" disabled={isInviting}>
+                  {isInviting ? '...' : 'Пригласить'}
+                </Button>
+              </form>
+              {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
+            </>
+          ) : (
+            <p className="rounded-md bg-muted/40 p-3 text-sm text-muted-foreground">
+              Приглашать и удалять участников может только владелец доски.
+            </p>
+          )}
 
           <div className="space-y-2 mt-4">
             <h4 className="text-sm font-medium text-muted-foreground">Участники:</h4>

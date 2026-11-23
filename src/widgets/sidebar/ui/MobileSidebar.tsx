@@ -30,7 +30,8 @@ export function MobileSidebar() {
           <span>TaskFlow</span>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-3">
+        {/* SidebarContent сам скроллит навигацию и прижимает «Выйти» к низу */}
+        <div className="min-h-0 flex-1">
           <SidebarContent onNavigate={() => setIsOpen(false)} />
         </div>
       </SheetContent>

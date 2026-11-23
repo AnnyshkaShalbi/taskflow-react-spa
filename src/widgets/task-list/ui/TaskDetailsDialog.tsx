@@ -40,6 +40,10 @@ export function TaskDetailsDialog({ task, onOpenChange }: TaskDetailsDialogProps
         className={cn(
           'flex flex-col gap-0 p-0 overflow-hidden',
           'sm:max-w-lg sm:max-h-[85dvh]',
+          // Модалка прикреплена к верху, а не центрирована: когда подгружаются комментарии
+          // (или меняется их число), она растёт только вниз — шапка и поля «Исполнитель»/«Срок»
+          // не сдвигаются, и открытый поповер календаря не «прыгает» вслед за полем
+          'top-4 translate-y-0 sm:top-[7.5dvh]',
         )}
       >
         {shownTask && <TaskDetails task={shownTask} />}
@@ -118,7 +122,7 @@ function TaskDetails({ task }: { task: Task }) {
               value={task.dueDate}
               onChange={setDueDate}
               aria-label="Срок"
-              className={cn('[&_input]:bg-background', isOverdue && '[&_input]:border-destructive/50 [&_input]:text-destructive')}
+              invalid={isOverdue}
             />
           </DetailItem>
 

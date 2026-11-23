@@ -43,7 +43,12 @@ export function UserSelect({
       onValueChange={(next) => onChange(next && next !== NONE ? next : undefined)}
       disabled={disabled}
     >
-      <SelectTrigger id={id} aria-label={ariaLabel} className={cn('w-full', className)}>
+      {/* На таче 40px — как поле даты рядом и остальные поля ввода */}
+      <SelectTrigger
+        id={id}
+        aria-label={ariaLabel}
+        className={cn('w-full pointer-coarse:data-[size=default]:h-10', className)}
+      >
         <SelectValue />
       </SelectTrigger>
       <SelectContent>

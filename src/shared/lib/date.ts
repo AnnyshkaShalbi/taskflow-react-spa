@@ -67,3 +67,36 @@ export function getLast7Days(): { dateStr: string; label: string }[] {
   }
   return days
 }
+// Дата без времени ("YYYY-MM-DD") → Date в ЛОКАЛЬНОМ часовом поясе.
+// new Date('2026-11-23') парсится как полночь UTC и западнее Гринвича превращается в 22-е число.
+function parseDate(value: string): Date {
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    const [y, m, d] = value.split('-').map(Number)
+    return new Date(y, m - 1, d)
+  }
+  return new Date(value)
+}
+
+// ISO-дата → «12 октября 2026» (или с временем: «12 октября 2026, 14:30»)
+export function formatDate(iso: string, withTime = false): string {
+  return parseDate(iso).toLocaleDateString('ru-RU', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    ...(withTime && { hour: '2-digit', minute: '2-digit' }),
+  })
+}
+
+const relativeFormatter = new Intl.RelativeTimeFormat('ru', { numeric: 'auto' })
+
+// ISO-дата → «только что», «5 минут назад», «вчера»; старше недели — обычная дата
+export function formatRelativeTime(iso: string): string {
+  const diffSeconds = Math.round((new Date(iso).getTime() - Date.now()) / 1000)
+  const abs = Math.abs(diffSeconds)
+
+  if (abs < 45) return 'только что'
+  if (abs < 3600) return relativeFormatter.format(Math.round(diffSeconds / 60), 'minute')
+  if (abs < 86400) return relativeFormatter.format(Math.round(diffSeconds / 3600), 'hour')
+  if (abs < 7 * 86400) return relativeFormatter.format(Math.round(diffSeconds / 86400), 'day')
+  return formatDate(iso)
+}

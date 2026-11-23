@@ -1,7 +1,6 @@
 import { useDroppable } from '@dnd-kit/core'
-import { TASK_STATUSES, taskStatusLabels, type TaskStatus } from '@/entities/task'
+import { TASK_STATUSES, taskStatusLabels, type TaskStatus, taskStatusColors } from '@/entities/task'
 import { cn } from 'cn'
-import { columnColors } from '../lib/columns'
 import { tabDroppableId } from '../lib/collision'
 import { DRAG_OVERLAY_Z_INDEX } from '../lib/z-index'
 
@@ -87,7 +86,7 @@ function KanbanTab({ status, count, isActive, isDragging, onSelect }: KanbanTabP
         isOver && 'scale-105 border-solid border-primary bg-primary/10 text-foreground',
       )}
     >
-      <span className={cn('hidden sm:block h-2 w-2 shrink-0 rounded-full', columnColors[status])} />
+      <span className={cn('hidden sm:block h-2 w-2 shrink-0 rounded-full', taskStatusColors[status])} />
       <span className="truncate">{taskStatusLabels[status]}</span>
       <span
         className={cn(

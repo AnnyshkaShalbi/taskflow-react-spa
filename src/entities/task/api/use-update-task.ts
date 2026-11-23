@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useAuthStore } from '@/entities/user'
 import { tasksApi } from './tasks.api'
-import type { Task, UpdateTaskInput } from '../model/types'
+import { applyTaskPatch, type Task, type UpdateTaskInput } from '../model/types'
 
 export function useUpdateTask() {
   const token = useAuthStore((s) => s.token)
@@ -23,7 +23,7 @@ export function useUpdateTask() {
       // Обновляем кэш руками (мгновенно меняем UI)
       queryClient.setQueriesData<Task[]>({ queryKey: ['tasks'] }, (old) =>
         old?.map((task) =>
-          task.id === id ? { ...task, ...input } : task,
+          task.id === id ? applyTaskPatch(task, input) : task,
         ),
       )
 

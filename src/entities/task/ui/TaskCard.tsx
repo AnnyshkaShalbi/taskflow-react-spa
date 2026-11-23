@@ -4,45 +4,69 @@ import { cn } from 'cn'
 import { StatusSelect } from './StatusSelect'
 import type { ReactNode } from 'react'
 
-import type { Task, TaskPriority } from '../model/types'
+import type { Task } from '../model/types'
+import { taskPriorityConfig } from '../model/priority'
 
 type TaskCardProps = {
   task: Task
   className?: string
   actions?: ReactNode
+  /** Если передан — карточка кликабельна (открыть подробный просмотр) */
+  onOpen?: () => void
 }
 
-const priorityConfig: Record<TaskPriority, { label: string; className: string }> = {
-  'low': { label: 'Низкий', className: 'text-muted-foreground border-muted-foreground/30' },
-  'medium': { label: 'Средний', className: 'text-amber-600 border-amber-600/30' },
-  'high': { label: 'Высокий', className: 'text-red-600 border-red-600/30' },
-}
+export function TaskCard({ task, className, actions, onOpen }: TaskCardProps) {
+  const priority = taskPriorityConfig[task.priority]
 
-export function TaskCard({ task, className, actions }: TaskCardProps) {
   return (
-    <Card className={cn('flex flex-col gap-3 hover:shadow-md transition-shadow', className)}>
+    <Card
+      className={cn(
+        'relative flex flex-col gap-3 hover:shadow-md transition-shadow',
+        onOpen && 'cursor-pointer hover:ring-foreground/20',
+        className,
+      )}
+    >
       <CardHeader>
         <div className="flex items-start gap-2">
           <CardTitle className="flex-1 min-w-0 wrap-break-word text-sm sm:text-base font-semibold leading-snug">
-            {task.title}
+            {onOpen ? (
+              // «Растянутая» кнопка: её ::after покрывает всю карточку — клик в любом месте открывает
+              // задачу, а с клавиатуры карточка доступна через Tab + Enter.
+              // Интерактивные элементы (статус, удаление) подняты над этим слоем через relative z-10.
+              <button
+                type="button"
+                onClick={onOpen}
+                className={cn(
+                  'text-left outline-none',
+                  "after:absolute after:inset-0 after:rounded-xl after:content-['']",
+                  'focus-visible:after:ring-2 focus-visible:after:ring-ring/50',
+                )}
+              >
+                {task.title}
+              </button>
+            ) : (
+              task.title
+            )}
           </CardTitle>
-          <Badge variant="outline" className={cn('shrink-0', priorityConfig[task.priority].className)}>
-            {priorityConfig[task.priority].label}
+          <Badge variant="outline" className={cn('shrink-0', priority.className)}>
+            {priority.label}
           </Badge>
-          {actions}
+          {actions && <div className="relative z-10 shrink-0">{actions}</div>}
         </div>
       </CardHeader>
-      
+
       <CardContent className="flex-1 flex flex-col justify-end gap-3">
         {task.description && (
           <p className="text-sm text-muted-foreground line-clamp-2">
             {task.description}
           </p>
         )}
-        
+
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <StatusSelect task={task} />
-          
+          <div className="relative z-10">
+            <StatusSelect task={task} />
+          </div>
+
           {task.tags.length > 0 && (
             <div className="flex gap-1 overflow-hidden">
               {task.tags.slice(0, 2).map(tag => (

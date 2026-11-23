@@ -8,7 +8,8 @@ export const createTaskSchema = z.object({
   description: z.string().max(1000, 'Максимум 1000 символов').optional(),
   status: taskStatusSchema,
   priority: taskPrioritySchema,
-  dueDate: z.string().datetime().optional(),
+  // Срок — дата без времени ("YYYY-MM-DD"): дедлайн «до дня», часовой пояс не нужен
+  dueDate: z.iso.date().optional(),
   boardId: z.string().min(1),
   assigneeId: z.string().optional(),
   tags: z.array(z.string()).default([]),

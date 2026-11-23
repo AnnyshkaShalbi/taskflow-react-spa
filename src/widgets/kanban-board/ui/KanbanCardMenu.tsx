@@ -1,6 +1,6 @@
 import type { SyntheticEvent } from 'react'
 import { MoreHorizontal } from 'lucide-react'
-import { TASK_STATUSES, taskStatusLabels, type TaskStatus } from '@/entities/task'
+import { TASK_STATUSES, taskStatusLabels, type TaskStatus, taskStatusColors } from '@/entities/task'
 import { Button } from '@/shared/ui/button'
 import {
   DropdownMenu,
@@ -12,7 +12,6 @@ import {
   DropdownMenuTrigger,
 } from '@/shared/ui/dropdown-menu'
 import { cn } from 'cn'
-import { columnColors } from '../lib/columns'
 
 type KanbanCardMenuProps = {
   status: TaskStatus
@@ -57,7 +56,7 @@ export function KanbanCardMenu({ status, onMove }: KanbanCardMenuProps) {
           >
             {TASK_STATUSES.map((s) => (
               <DropdownMenuRadioItem key={s} value={s} className="gap-2 pointer-coarse:py-2.5">
-                <span className={cn('h-2 w-2 rounded-full', columnColors[s])} />
+                <span className={cn('h-2 w-2 rounded-full', taskStatusColors[s])} />
                 {taskStatusLabels[s]}
               </DropdownMenuRadioItem>
             ))}

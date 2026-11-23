@@ -9,7 +9,7 @@ export type Task = Timestamps & {
   description?: string
   status: TaskStatus
   priority: TaskPriority
-  dueDate?: string // ISO 8601 дедлайн
+  dueDate?: string // дедлайн, дата без времени: "YYYY-MM-DD"
   boardId: ID
   assigneeId?: ID
   tags: string[]
@@ -22,4 +22,17 @@ export type CreateTaskInput = Pick<Task, 'title' | 'status' | 'priority' | 'boar
   tags?: string[]
 }
 
-export type UpdateTaskInput = Partial<Omit<Task, 'id' | 'createdAt' | 'updatedAt'>>
+// null у необязательных полей = «очистить» (undefined при JSON.stringify просто выпадает из запроса)
+export type UpdateTaskInput = Partial<Omit<Task, 'id' | 'createdAt' | 'updatedAt' | 'assigneeId' | 'dueDate'>> & {
+  assigneeId?: ID | null
+  dueDate?: string | null
+}
+
+/** Применить патч к задаче: null-поля удаляются (так же делает сервер) */
+export function applyTaskPatch(task: Task, patch: UpdateTaskInput): Task {
+  const next: Record<string, unknown> = { ...task, ...patch }
+  for (const key of Object.keys(next)) {
+    if (next[key] === null) delete next[key]
+  }
+  return next as Task
+}

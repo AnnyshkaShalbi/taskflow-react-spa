@@ -5,6 +5,7 @@ export type {
   CreateTaskInput,
   UpdateTaskInput,
 } from './model/types'
+export { applyTaskPatch } from './model/types'
 
 export { 
   taskStatusSchema, 
@@ -17,7 +18,8 @@ export type {
   CreateTaskInputValues 
 } from './model/shema'
 
-export { TASK_STATUSES, taskStatusLabels } from './model/status'
+export { TASK_STATUSES, taskStatusLabels, taskStatusColors } from './model/status'
+export { taskPriorityConfig } from './model/priority'
 
 export { useTasks } from './api/use-tasks'
 export { useCreateTask } from './api/use-create-task'

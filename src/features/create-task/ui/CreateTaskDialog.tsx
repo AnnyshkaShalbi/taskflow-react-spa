@@ -7,6 +7,8 @@ import {
   useCreateTask,
   TASK_STATUSES,
   taskStatusLabels,
+  taskPriorityConfig,
+  type TaskPriority,
   type CreateTaskInputValues,
   type CreateTaskFormValues,
 } from '@/entities/task'
@@ -35,7 +37,15 @@ import {
   FormLabel,
   FormMessage,
 } from '@/shared/ui/form'
-import { useBoardStore } from '@/entities/board'
+import { getBoardMemberIds, useBoardStore, useBoards } from '@/entities/board'
+import { UserSelect, useUsers } from '@/entities/user'
+import { DateInput } from '@/shared/ui/date-input'
+
+const PRIORITIES: TaskPriority[] = ['low', 'medium', 'high']
+// value → подпись для Select (иначе в поле видно 'medium', а не «Средний»)
+const priorityItems = Object.fromEntries(
+  PRIORITIES.map((p) => [p, taskPriorityConfig[p].label]),
+) as Record<TaskPriority, string>
 
 type CreateTaskDialogProps = {
   triggerClassName?: string
@@ -45,6 +55,16 @@ export function CreateTaskDialog({ triggerClassName }: CreateTaskDialogProps) {
   const [open, setOpen] = useState(false)
   const { mutate, isPending } = useCreateTask()
   const activeBoardId = useBoardStore((s) => s.activeBoardId)
+
+  // Назначить можно только участника текущей доски
+  const { data: boards = [] } = useBoards()
+  const { data: users = [] } = useUsers()
+  const activeBoard = boards.find((b) => b.id === activeBoardId)
+  const boardMembers = activeBoard
+    ? getBoardMemberIds(activeBoard)
+        .map((id) => users.find((u) => u.id === id))
+        .filter((u): u is NonNullable<typeof u> => !!u)
+    : []
 
   const form = useForm<CreateTaskInputValues, unknown, CreateTaskFormValues>({
     resolver: zodResolver(createTaskSchema),
@@ -124,6 +144,7 @@ export function CreateTaskDialog({ triggerClassName }: CreateTaskDialogProps) {
                   <FormItem>
                     <FormLabel>Статус</FormLabel>
                     <Select
+                      items={taskStatusLabels}
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                     >
@@ -152,6 +173,7 @@ export function CreateTaskDialog({ triggerClassName }: CreateTaskDialogProps) {
                   <FormItem>
                     <FormLabel>Приоритет</FormLabel>
                     <Select
+                      items={priorityItems}
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                     >
@@ -161,11 +183,44 @@ export function CreateTaskDialog({ triggerClassName }: CreateTaskDialogProps) {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="low">Низкий</SelectItem>
-                        <SelectItem value="medium">Средний</SelectItem>
-                        <SelectItem value="high">Высокий</SelectItem>
+                        {PRIORITIES.map((priority) => (
+                          <SelectItem key={priority} value={priority}>
+                            {priorityItems[priority]}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {/* Дата на мобилке узкой колонкой не помещается — поля друг под другом */}
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="assigneeId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Исполнитель</FormLabel>
+                    <FormControl>
+                      <UserSelect users={boardMembers} value={field.value} onChange={field.onChange} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="dueDate"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Срок</FormLabel>
+                    <FormControl>
+                      <DateInput value={field.value} onChange={field.onChange} />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}

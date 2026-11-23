@@ -1,7 +1,9 @@
+import { useState } from 'react'
 import { useTasks, TaskCard } from '@/entities/task'
 import { Skeleton } from '@/shared/ui/skeleton'
 import { ClipboardList } from 'lucide-react'
 import { DeleteTaskButton } from '@/features/delete-task'
+import { TaskDetailsDialog } from './TaskDetailsDialog'
 
 // Как в списке привычек: колонки по реальной ширине контента — с md появляется сайдбар (224px),
 // и 2 колонки на 768–1023px / 3 колонки на 1024–1279px дают слишком узкие карточки
@@ -9,6 +11,10 @@ const gridClass = 'grid gap-3 sm:gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-col
 
 export function TaskList() {
   const { data: tasks, isLoading, isError } = useTasks()
+  // Храним id, а не саму задачу: модалка берёт актуальные данные из кэша — если статус поменяли
+  // (или задачу удалили), она сразу это отражает / закрывается
+  const [openTaskId, setOpenTaskId] = useState<string | null>(null)
+  const openTask = tasks?.find((t) => t.id === openTaskId) ?? null
 
   if (isLoading) {
     return (
@@ -54,10 +60,22 @@ export function TaskList() {
   }
 
   return (
-    <div className={gridClass}>
-      {tasks.map((task) => (
-        <TaskCard key={task.id} task={task} actions={<DeleteTaskButton taskId={task.id} />} />
-      ))}
-    </div>
+    <>
+      <div className={gridClass}>
+        {tasks.map((task) => (
+          <TaskCard
+            key={task.id}
+            task={task}
+            actions={<DeleteTaskButton taskId={task.id} />}
+            onOpen={() => setOpenTaskId(task.id)}
+          />
+        ))}
+      </div>
+
+      <TaskDetailsDialog
+        task={openTask}
+        onOpenChange={(open) => !open && setOpenTaskId(null)}
+      />
+    </>
   )
 }

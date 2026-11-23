@@ -1,8 +1,7 @@
 import type { ReactNode } from 'react'
 import { useDroppable } from '@dnd-kit/core'
-import { taskStatusLabels, type TaskStatus } from '@/entities/task'
+import { taskStatusLabels, type TaskStatus, taskStatusColors } from '@/entities/task'
 import { cn } from 'cn'
-import { columnColors } from '../lib/columns'
 
 type KanbanColumnProps = {
   status: TaskStatus
@@ -33,7 +32,7 @@ export function KanbanColumn({ status, count, children, columnRef }: KanbanColum
     >
       <div className="flex items-center justify-between p-3 sm:p-4 border-b bg-background rounded-t-xl pointer-events-none">
         <div className="flex items-center gap-2">
-          <div className={cn('w-2 h-2 rounded-full', columnColors[status])} />
+          <div className={cn('w-2 h-2 rounded-full', taskStatusColors[status])} />
           <h3 className="font-semibold text-sm">{taskStatusLabels[status]}</h3>
         </div>
         {/* Высота = мин. ширина → круг для 1 цифры, «пилюля» для 2+ */}

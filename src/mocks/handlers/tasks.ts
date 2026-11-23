@@ -1,6 +1,7 @@
 import { http, HttpResponse, delay } from 'msw'
-import type { Task, CreateTaskInput, UpdateTaskInput } from '@/entities/task'
+import { applyTaskPatch, type Task, type CreateTaskInput, type UpdateTaskInput } from '@/entities/task'
 import { mockTasks } from '../data/tasks'
+import { deleteCommentsByTask } from './comments'
 
 const STORAGE_KEY = 'taskflow-mock-tasks'
 
@@ -66,9 +67,9 @@ export const taskHandlers = [
       return HttpResponse.json({ message: 'Задача не найдена' }, { status: 404 })
     }
 
+    // null в патче = очистить поле (снять исполнителя, убрать срок)
     tasks[index] = {
-      ...tasks[index],
-      ...patch,
+      ...applyTaskPatch(tasks[index], patch),
       updatedAt: new Date().toISOString(),
     }
 
@@ -82,6 +83,8 @@ export const taskHandlers = [
     const { id } = params
     const tasks = getTasks().filter((t) => t.id !== id)
     saveTasks(tasks)
+    // Каскадно удаляем комментарии задачи — как сделал бы настоящий бэкенд
+    deleteCommentsByTask(String(id))
     return new HttpResponse(null, { status: 204 })
   }),
 ]

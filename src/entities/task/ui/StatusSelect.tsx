@@ -25,8 +25,11 @@ export function StatusSelect({ task }: StatusSelectProps) {
   }
 
   return (
+    // value (а не defaultValue): селект следует за кэшем — если статус сменили на канбане
+    // или в модалке, здесь он тоже обновится. items — чтобы показывалась подпись, а не 'todo'
     <Select
-      defaultValue={task.status}
+      items={taskStatusLabels}
+      value={task.status}
       onValueChange={handleStatusChange}
       disabled={isPending}
     >

@@ -25,18 +25,18 @@ export const DEMO_ACCOUNTS: DemoAccount[] = __DEMO_MODE__ ? [
     email: 'anna@taskflow.dev',
     password: 'password123',
     name: 'Анна Шалбуз',
-    description: 'Владелец досок · управляет участниками',
+    description: 'Создатель большинства досок',
   },
   {
     email: 'ivan@taskflow.dev',
     password: 'password123',
     name: 'Иван Петров',
-    description: 'Своя доска + участник чужих',
+    description: 'Своя доска + участник досок Анны',
   },
   {
     email: 'maria@taskflow.dev',
     password: 'password123',
     name: 'Мария Сидорова',
-    description: 'Только участник · без прав управления',
+    description: 'Участник общей доски «Работа»',
   },
 ] : []
